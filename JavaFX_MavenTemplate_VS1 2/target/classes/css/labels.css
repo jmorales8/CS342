@@ -1,0 +1,32 @@
+/* Title and heading styles */
+.title-text {
+  -fx-font-family: "Arial" !important;
+  -fx-font-size: 36px !important;
+  -fx-fill: white !important;
+}
+
+.game-info-label {
+  -fx-text-fill: #00ff00 !important;
+  -fx-font-size: 18px !important;
+}
+
+.dealer-label {
+  -fx-text-fill: white !important;
+  -fx-font-size: 16px !important;
+}
+
+/* Status labels */
+.winnings-label {
+  -fx-text-fill: #00ff00 !important;
+  -fx-font-size: 14px !important;
+  -fx-font-weight: bold !important;
+}
+
+.pushed-antes-label {
+  -fx-text-fill: yellow !important;
+  -fx-font-size: 14px !important;
+}
+
+.player-label {
+  -fx-text-fill: white !important;
+}

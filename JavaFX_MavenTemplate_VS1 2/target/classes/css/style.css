@@ -1,0 +1,199 @@
+.scroll-pane {
+  -fx-background-color: #1a1a1a;
+}
+
+.scroll-pane > .viewport {
+  -fx-background-color: #1a1a1a;
+}
+
+.scroll-bar:vertical,
+.scroll-bar:horizontal {
+  -fx-background-color: #1a1a1a;
+}
+
+.scroll-bar:vertical .thumb,
+.scroll-bar:horizontal .thumb {
+  -fx-background-color: #333333;
+  -fx-background-radius: 5em;
+}
+
+.scroll-bar:vertical .track,
+.scroll-bar:horizontal .track {
+  -fx-background-color: #1a1a1a;
+  -fx-border-color: #1a1a1a;
+}
+
+.scroll-bar .increment-button,
+.scroll-bar .decrement-button {
+  -fx-background-color: #1a1a1a;
+  -fx-border-color: #1a1a1a;
+}
+
+.scroll-bar .increment-arrow,
+.scroll-bar .decrement-arrow {
+  -fx-background-color: white;
+}
+.root {
+  -fx-background-color: #1a1a1a;
+}
+
+/* Text styles */
+.title-text {
+  -fx-font-family: "Arial";
+  -fx-font-size: 36px;
+  -fx-fill: white;
+}
+
+.game-info-label {
+  -fx-text-fill: #00ff00;
+  -fx-font-size: 18px;
+}
+
+.dealer-label {
+  -fx-text-fill: white;
+  -fx-font-size: 16px;
+}
+
+/* Button styles */
+.primary-button {
+  -fx-background-color: #4CAF50;
+  -fx-text-fill: white;
+  -fx-font-size: 14px;
+  -fx-padding: 10 20 10 20;
+  -fx-min-width: 200px;
+}
+
+.primary-button:hover {
+  -fx-background-color: #45a049;
+}
+
+.danger-button {
+  -fx-background-color: #f44336;
+  -fx-text-fill: white;
+  -fx-font-size: 14px;
+  -fx-padding: 10 20 10 20;
+  -fx-min-width: 200px;
+}
+
+.danger-button:hover {
+  -fx-background-color: #d32f2f;
+}
+
+.play-button {
+  -fx-background-color: #4CAF50;
+  -fx-text-fill: white;
+  -fx-font-size: 14px;
+  -fx-min-width: 60px;
+  -fx-background-radius: 3px;
+}
+
+.fold-button {
+  -fx-background-color: #f44336;
+  -fx-text-fill: white;
+  -fx-font-size: 14px;
+  -fx-min-width: 60px;
+  -fx-background-radius: 3px;
+}
+
+/* Container styles */
+.scroll-pane {
+  -fx-background: #1a1a1a;
+  -fx-background-color: #1a1a1a;
+  -fx-control-inner-background: #1a1a1a;
+}
+
+.player-area {
+  -fx-padding: 10px;
+  -fx-border-color: #333333;
+}
+
+/* Label styles */
+.winnings-label {
+  -fx-text-fill: #00ff00;
+  -fx-font-size: 14px;
+  -fx-font-weight: bold;
+}
+
+.pushed-antes-label {
+  -fx-text-fill: yellow;
+  -fx-font-size: 14px;
+}
+
+.player-label {
+  -fx-text-fill: white;
+}
+
+/* TextFields */
+.styled-textfield {
+  -fx-background-color: #333333;
+  -fx-text-fill: white;
+  -fx-border-color: #4CAF50;
+  -fx-border-width: 1px;
+  -fx-border-radius: 3px;
+}
+
+/* HBox and VBox styles */
+.card-container {
+  -fx-spacing: 10;
+  -fx-alignment: center;
+}
+
+.button-container {
+  -fx-spacing: 10;
+  -fx-alignment: center;
+}
+
+/* Menu styles */
+.menu-bar {
+  -fx-background-color: #333333;
+}
+
+.menu {
+  -fx-text-fill: white;
+}
+
+.menu-item {
+  -fx-background-color: #333333;
+}
+
+.menu-item:hover {
+  -fx-background-color: #4CAF50;
+}
+/* Button base styles */
+.game-button {
+  -fx-text-fill: white;
+  -fx-font-size: 14px;
+  -fx-min-width: 60px;
+  -fx-background-radius: 3px;
+}
+
+/* Play button styles */
+.play-button {
+  -fx-background-color: #4CAF50;
+}
+
+.play-button:hover {
+  -fx-background-color: #45a049;
+}
+
+/* Fold button styles */
+.fold-button {
+  -fx-background-color: #f44336;
+}
+
+.fold-button:hover {
+  -fx-background-color: #d32f2f;
+}
+
+/* Generic button styles (for other buttons) */
+.default-button {
+  -fx-background-color: #4CAF50;
+}
+
+.default-button:hover {
+  -fx-background-color: #45a049;
+}
+
+/*
+mvn clean compile exec:java 
+*/

@@ -1,0 +1,101 @@
+/* Button base styles */
+.game-button {
+  -fx-text-fill: white !important;
+  -fx-font-size: 14px !important;
+  -fx-min-width: 60px !important;
+  -fx-background-radius: 3px !important;
+  -fx-font-weight: bold !important;
+  -fx-alignment: center !important;
+  -fx-text-alignment: center !important;
+}
+
+/* Play button specific styles */
+.play-button {
+  -fx-background-color: #4CAF50 !important;
+}
+
+.play-button:hover {
+  -fx-background-color: #45a049 !important;
+}
+
+/* Fold button specific styles */
+.fold-button {
+  -fx-background-color: #f44336 !important;
+}
+
+.fold-button:hover {
+  -fx-background-color: #d32f2f !important;
+}
+
+/* Primary button styles (like Deal button) */
+.primary-button {
+  -fx-background-color: #4CAF50 !important;
+  -fx-text-fill: white !important;
+  -fx-font-size: 14px !important;
+  -fx-padding: 10 20 10 20 !important;
+  -fx-min-width: 200px !important;
+  -fx-font-weight: bold !important;
+  -fx-alignment: center !important;
+  -fx-text-alignment: center !important;
+}
+
+.primary-button:hover {
+  -fx-background-color: #45a049 !important;
+}
+
+/* Danger button styles (like Back/Exit buttons) */
+.danger-button {
+  -fx-background-color: #f44336 !important;
+  -fx-text-fill: white !important;
+  -fx-font-size: 14px !important;
+  -fx-padding: 10 20 10 20 !important;
+  -fx-min-width: 200px !important;
+  -fx-font-weight: bold !important;
+  -fx-alignment: center !important;
+  -fx-text-alignment: center !important;
+}
+
+.danger-button:hover {
+  -fx-background-color: #d32f2f !important;
+}
+
+/* Default button styles */
+.default-button {
+  -fx-background-color: #4CAF50 !important;
+  -fx-font-weight: bold !important;
+  -fx-alignment: center !important;
+  -fx-text-alignment: center !important;
+}
+
+.default-button:hover {
+  -fx-background-color: #45a049 !important;
+}
+
+
+/* Disabled button states */
+.game-button:disabled {
+  -fx-background-color: #808080 !important;  /* Gray background */
+  -fx-opacity: 0.7 !important;               /* Slightly transparent */
+  -fx-cursor: default !important;            /* Regular cursor instead of hand */
+}
+
+.play-button:disabled {
+  -fx-background-color: #76ab78 !important;  /* Muted green */
+  -fx-opacity: 0.7 !important;
+}
+
+.fold-button:disabled {
+  -fx-background-color: #c17b74 !important;  /* Muted red */
+  -fx-opacity: 0.7 !important;
+}
+
+/* Add hover effects for disabled states to remove hover behavior */
+.play-button:disabled:hover {
+  -fx-background-color: #76ab78 !important;  /* Same as disabled state */
+  -fx-cursor: default !important;
+}
+
+.fold-button:disabled:hover {
+  -fx-background-color: #c17b74 !important;  /* Same as disabled state */
+  -fx-cursor: default !important;
+}

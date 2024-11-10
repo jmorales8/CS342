@@ -1,0 +1,102 @@
+.root {
+  -fx-background-color: #ba8383 !important;
+}
+
+.scroll-pane {
+  -fx-background-color: #ba8383 !important;
+}
+
+.scroll-pane > .viewport {
+  -fx-background-color: #ba8383 !important;
+}
+
+/* Button styles - Light theme */
+.game-button {
+  -fx-text-fill: #1a1a1a !important;
+  -fx-font-weight: bold !important;
+  -fx-background-radius: 3px !important;
+}
+
+.play-button {
+  -fx-background-color: #90EE90 !important;  /* Light green */
+}
+
+.play-button:hover {
+  -fx-background-color: #98FB98 !important;
+}
+
+.fold-button {
+  -fx-background-color: #FFB6C1 !important;  /* Light red */
+}
+
+.fold-button:hover {
+  -fx-background-color: #FFC0CB !important;
+}
+
+.primary-button {
+  -fx-background-color: #90EE90 !important;
+  -fx-text-fill: #1a1a1a !important;
+}
+
+.danger-button {
+  -fx-background-color: #FFB6C1 !important;
+  -fx-text-fill: #1a1a1a !important;
+}
+
+/* Labels - Light theme */
+.player-label {
+  -fx-text-fill: #1a1a1a !important;
+}
+
+.dealer-label {
+  -fx-text-fill: #1a1a1a !important;
+}
+
+.game-info-label {
+  -fx-text-fill: #006400 !important;  /* Dark green */
+}
+
+.winnings-label {
+  -fx-text-fill: #006400 !important;
+}
+
+.pushed-antes-label {
+  -fx-text-fill: #8B4513 !important;  /* Dark brown */
+}
+
+/* TextField - Light theme */
+.styled-textfield {
+  -fx-background-color: white !important;
+  -fx-text-fill: #1a1a1a !important;
+  -fx-border-color: #90EE90 !important;
+}
+
+/* Player areas - Light theme */
+.player-area {
+  -fx-border-color: #DCDCDC !important;
+  -fx-background-color: #FFFFFF !important;
+  -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 0) !important;
+}
+
+/* Menu - Light theme */
+.menu-bar {
+  -fx-background-color: #E8E8E8 !important;
+}
+
+.menu-item {
+  -fx-background-color: #F5F5F5 !important;
+}
+
+.menu-item:hover {
+  -fx-background-color: #90EE90 !important;
+}
+
+.menu-item .label {
+  -fx-text-fill: #1a1a1a !important;
+}
+
+/* Disabled states - Light theme */
+.game-button:disabled {
+  -fx-background-color: #D3D3D3 !important;
+  -fx-opacity: 0.7 !important;
+}

@@ -77,44 +77,93 @@ public class JavaFXTemplate extends Application {
     private int player2PushedAntes = 0;
     private Label player1PushedAntesLabel;
     private Label player2PushedAntesLabel;
-
+    private MenuItem newLookItem;
     @Override
     public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
         primaryStage.setTitle("Three Card Poker");
-
+    
         // Initialize game objects
         playerOne = new Player();
         playerTwo = new Player();
         theDealer = new Dealer();
-
+    
+        // Load CSS first
+        String css = getClass().getResource("/css/dark-theme.css").toExternalForm();
+    
         createStartScreen();
         createGameScreen();
-
+    
+        // Apply CSS to both scenes
+        startScene.getStylesheets().add(css);
+        gameScene.getStylesheets().add(css);
+        
+        // Set initial theme
+        currentTheme = "default";
+    
         primaryStage.setScene(startScene);
         primaryStage.show();
     }
+    private void loadStyles(Scene scene) {
+        String[] stylesheets = {
+            "/css/buttons.css",
+            "/css/inputs.css",
+            "/css/labels.css",
+            "/css/containers.css",
+            "/css/menu.css"
+        };
 
+        for (String stylesheet : stylesheets) {
+            String css = getClass().getResource(stylesheet).toExternalForm();
+            scene.getStylesheets().add(css);
+        }
+    }
+    private void toggleTheme() {
+        // Clear existing stylesheets
+        gameScene.getStylesheets().clear();
+        startScene.getStylesheets().clear();
+    
+        if ("default".equals(currentTheme)) {
+            // Switch to light theme
+            currentTheme = "light";
+            loadTheme("/css/light-theme.css");
+            newLookItem.setText("Switch to Dark Theme");
+        } else {
+            // Switch to dark theme
+            currentTheme = "default";
+            loadTheme("/css/dark-theme.css");
+            newLookItem.setText("Switch to Light Theme");
+        }
+    }
+
+    private void loadTheme(String themePath) {
+        try {
+            String css = getClass().getResource(themePath).toExternalForm();
+            // Apply to both scenes
+            gameScene.getStylesheets().add(css);
+            startScene.getStylesheets().add(css);
+        } catch (Exception e) {
+            System.err.println("Failed to load theme: " + themePath);
+            e.printStackTrace();
+        }
+    }
     private void createStartScreen() {
         VBox startRoot = new VBox(20);
         startRoot.setAlignment(Pos.CENTER);
-        startRoot.setStyle("-fx-background-color: #1a1a1a;");
+        startRoot.getStyleClass().add("root");
 
         Text titleText = new Text("Welcome to Three Card Poker");
-        titleText.setFont(new Font("Arial", 36));
-        titleText.setStyle("-fx-fill: white;");
+        titleText.getStyleClass().add("title-text");
 
         Button startButton = new Button("Start Game");
-        Button exitButton = new Button("Exit");
+        startButton.getStyleClass().add("primary-button");
 
-        String buttonStyle = "-fx-background-color: #4CAF50; -fx-text-fill: white; "
-                + "-fx-font-size: 16px; -fx-padding: 10 20 10 20; -fx-min-width: 200px;";
-        startButton.setStyle(buttonStyle);
-        exitButton.setStyle(buttonStyle.replace("#4CAF50", "#f44336"));
+        Button exitButton = new Button("Exit");
+        exitButton.getStyleClass().add("danger-button");
 
         startButton.setOnAction(e -> {
             showGameScreen();
-            startNewRound(); // Start a new round immediately when game screen is shown
+            startNewRound();
         });
         exitButton.setOnAction(e -> Platform.exit());
 
@@ -124,109 +173,119 @@ public class JavaFXTemplate extends Application {
 
     private void createGameScreen() {
         BorderPane gameRoot = new BorderPane();
-        gameRoot.setStyle("-fx-background-color: #1a1a1a;");
+        gameRoot.getStyleClass().add("root");
 
         // Create ScrollPane
         ScrollPane scrollPane = new ScrollPane();
-        scrollPane.setStyle(
-                "-fx-background: #1a1a1a; "
-                + "-fx-background-color: #1a1a1a; "
-                + "-fx-control-inner-background: #1a1a1a;"
-        );
+        scrollPane.getStyleClass().add("scroll-pane");
         scrollPane.setFitToWidth(true);
 
         // Main content container
         VBox mainContent = new VBox(20);
         mainContent.setPadding(new Insets(20));
-        mainContent.setStyle("-fx-background-color: #1a1a1a;");
+        mainContent.getStyleClass().add("root");
 
         // Dealer area at top with title
         VBox dealerArea = new VBox(10);
         dealerArea.setAlignment(Pos.CENTER);
         Label dealerLabel = new Label("Dealer's Cards");
-        dealerLabel.setStyle("-fx-text-fill: white; -fx-font-size: 16px;");
+        dealerLabel.getStyleClass().add("dealer-label");
         dealerCards = new HBox(10);
         dealerCards.setAlignment(Pos.CENTER);
+        dealerCards.getStyleClass().add("card-container");
         dealerArea.getChildren().addAll(dealerLabel, dealerCards);
 
         // Game info display
         gameInfoLabel = new Label("Players: Place your bets");
-        gameInfoLabel.setStyle("-fx-text-fill: #00ff00; -fx-font-size: 18px;");
+        gameInfoLabel.getStyleClass().add("game-info-label");
         dealerArea.getChildren().add(gameInfoLabel);
 
         // Create horizontal container for both players
         HBox playersContainer = new HBox(50);
         playersContainer.setAlignment(Pos.CENTER);
-// Player 1 Area
+
+        // Player 1 Area
         player1Area = new VBox(10);
-        player1Area.setStyle("-fx-padding: 10px; -fx-border-color: #333333;");
+        player1Area.getStyleClass().add("player-area");
         Label player1Label = new Label("Player 1 Cards");
-        player1Label.setStyle("-fx-text-fill: white;");
+        player1Label.getStyleClass().add("player-label");
         player1Cards = new HBox(10);
+        player1Cards.getStyleClass().add("card-container");
+
         player1AnteField = createStyledTextField("Enter Ante Bet");
         player1PairPlusField = createStyledTextField("Enter Pair Plus Bet");
         player1PlayButton = createStyledButton("Play", "#4CAF50");
         player1FoldButton = createStyledButton("Fold", "#f44336");
+
         player1TotalWinningsLabel = new Label("Total Winnings: $0");
-        player1TotalWinningsLabel.setStyle("-fx-text-fill: #00ff00; -fx-font-size: 14px; -fx-font-weight: bold;");
+        player1TotalWinningsLabel.getStyleClass().add("winnings-label");
+
         player1PushedAntesLabel = new Label("Pushed Antes: $0");
-        player1PushedAntesLabel.setStyle("-fx-text-fill: yellow; -fx-font-size: 14px;");
+        player1PushedAntesLabel.getStyleClass().add("pushed-antes-label");
 
         HBox player1Buttons = new HBox(10, player1PlayButton, player1FoldButton);
+        player1Buttons.getStyleClass().add("button-container");
+
+        Label anteLabel1 = new Label("Ante:");
+        Label pairPlusLabel1 = new Label("Pair+:");
+        anteLabel1.getStyleClass().add("player-label");
+        pairPlusLabel1.getStyleClass().add("player-label");
+
         player1Area.getChildren().addAll(
                 player1Label,
                 player1TotalWinningsLabel,
                 player1PushedAntesLabel,
                 player1Cards,
-                new Label("Ante:"), player1AnteField,
-                new Label("Pair+:"), player1PairPlusField,
+                anteLabel1, player1AnteField,
+                pairPlusLabel1, player1PairPlusField,
                 player1Buttons
         );
 
-// Player 2 Area
+        // Player 2 Area
         player2Area = new VBox(10);
-        player2Area.setStyle("-fx-padding: 10px; -fx-border-color: #333333;");
+        player2Area.getStyleClass().add("player-area");
         Label player2Label = new Label("Player 2 Cards");
-        player2Label.setStyle("-fx-text-fill: white;");
+        player2Label.getStyleClass().add("player-label");
         player2Cards = new HBox(10);
+        player2Cards.getStyleClass().add("card-container");
+
         player2AnteField = createStyledTextField("Enter Ante Bet");
         player2PairPlusField = createStyledTextField("Enter Pair Plus Bet");
         player2PlayButton = createStyledButton("Play", "#4CAF50");
         player2FoldButton = createStyledButton("Fold", "#f44336");
+
         player2TotalWinningsLabel = new Label("Total Winnings: $0");
-        player2TotalWinningsLabel.setStyle("-fx-text-fill: #00ff00; -fx-font-size: 14px; -fx-font-weight: bold;");
+        player2TotalWinningsLabel.getStyleClass().add("winnings-label");
+
         player2PushedAntesLabel = new Label("Pushed Antes: $0");
-        player2PushedAntesLabel.setStyle("-fx-text-fill: yellow; -fx-font-size: 14px;");
+        player2PushedAntesLabel.getStyleClass().add("pushed-antes-label");
 
         HBox player2Buttons = new HBox(10, player2PlayButton, player2FoldButton);
+        player2Buttons.getStyleClass().add("button-container");
+
+        Label anteLabel2 = new Label("Ante:");
+        Label pairPlusLabel2 = new Label("Pair+:");
+        anteLabel2.getStyleClass().add("player-label");
+        pairPlusLabel2.getStyleClass().add("player-label");
+
         player2Area.getChildren().addAll(
                 player2Label,
                 player2TotalWinningsLabel,
                 player2PushedAntesLabel,
                 player2Cards,
-                new Label("Ante:"), player2AnteField,
-                new Label("Pair+:"), player2PairPlusField,
+                anteLabel2, player2AnteField,
+                pairPlusLabel2, player2PairPlusField,
                 player2Buttons
         );
-
-        // Style all labels in player areas
-// Style all labels in player areas
-        for (VBox playerArea : Arrays.asList(player1Area, player2Area)) {
-            playerArea.getChildren().forEach(node -> {
-                if (node instanceof Label) {
-                    ((Label) node).setStyle("-fx-text-fill: white;");
-                }
-            });
-        }
 
         // Add players to horizontal container
         playersContainer.getChildren().addAll(player1Area, player2Area);
 
         // Create deal button and play again label
         dealButton = new Button("Deal");
-        dealButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 14px;");
+        dealButton.getStyleClass().add("primary-button");
         Label playAgainLabel = new Label("Play Again?");
-        playAgainLabel.setStyle("-fx-text-fill: white; -fx-font-size: 16px;");
+        playAgainLabel.getStyleClass().add("player-label");
 
         // Create an HBox to hold the play again label and deal button
         playAgainBox = new HBox(10);
@@ -240,7 +299,7 @@ public class JavaFXTemplate extends Application {
         topBar.setPadding(new Insets(10));
 
         Button backButton = new Button("Back to Menu");
-        backButton.setStyle("-fx-background-color: #f44336; -fx-text-fill: white;");
+        backButton.getStyleClass().add("danger-button");
         backButton.setOnAction(e -> showStartScreen());
 
         dealButton.setOnAction(e -> {
@@ -266,64 +325,36 @@ public class JavaFXTemplate extends Application {
         gameRoot.setTop(topBar);
         gameRoot.setCenter(scrollPane);
 
+        // Create game scene
         gameScene = new Scene(gameRoot, 1200, 800);
-        dealButton.setOnAction(e -> {
-            playAgainBox.setVisible(false);
 
-            // Reset player bets and states
-            playerOne.anteBet = 0;
-            playerOne.playBet = 0;
-            playerOne.pairPlusBet = 0;
-            playerTwo.anteBet = 0;
-            playerTwo.playBet = 0;
-            playerTwo.pairPlusBet = 0;
-
-            // Reset betting flags
-            player1InitialBetMade = false;
-            player2InitialBetMade = false;
-            player1PlayDecisionMade = false;
-            player2PlayDecisionMade = false;
-
-            // Enable all controls
-            setPlayer1ControlsEnabled(true);
-            setPlayer2ControlsEnabled(true);
-
-            // Reset text fields
-            player1AnteField.clear();
-            player1PairPlusField.clear();
-            player2AnteField.clear();
-            player2PairPlusField.clear();
-
-            // Reset button text
-            player1PlayButton.setText("Play");
-            player2PlayButton.setText("Play");
-            player1FoldButton.setText("Fold");
-            player2FoldButton.setText("Fold");
-
-            // Start new round
-            startNewRound();
-        });
+        // Menu setup
         MenuBar menuBar = new MenuBar();
-        Menu optionsMenu = new Menu("Options");
+    menuBar.getStyleClass().add("menu-bar");
+    
+    Menu optionsMenu = new Menu("Options");
+    optionsMenu.getStyleClass().add("menu");
 
-        MenuItem exitItem = new MenuItem("Exit");
-        MenuItem freshStartItem = new MenuItem("Fresh Start");
-        MenuItem newLookItem = new MenuItem("New Look");
-        newLookItem.setOnAction(e -> toggleTheme());
+    MenuItem exitItem = new MenuItem("Exit");
+    MenuItem freshStartItem = new MenuItem("Fresh Start");
+    newLookItem = new MenuItem("Switch to Light Theme");  // Initialize the class field here
 
-        optionsMenu.getItems().addAll(exitItem, freshStartItem, newLookItem);
-        menuBar.getMenus().add(optionsMenu);
+    // Add styles to menu items
+    Arrays.asList(exitItem, freshStartItem, newLookItem)
+        .forEach(item -> item.getStyleClass().add("menu-item"));
 
-        // Add event handlers
-        exitItem.setOnAction(e -> showExitScreen());
-        freshStartItem.setOnAction(e -> resetGame());
-        newLookItem.setOnAction(e -> toggleTheme());
+    // Add event handlers
+    exitItem.setOnAction(e -> showExitScreen());
+    freshStartItem.setOnAction(e -> resetGame());
+    newLookItem.setOnAction(e -> toggleTheme());
+
+    optionsMenu.getItems().addAll(exitItem, freshStartItem, newLookItem);
+    menuBar.getMenus().add(optionsMenu);
 
         // Add MenuBar to top of BorderPane
         VBox topContainer = new VBox();
         topContainer.getChildren().addAll(menuBar, playAgainBox);
         gameRoot.setTop(topContainer);
-        updateTotalWinningsLabelStyles();
     }
 
     private void updateTotalWinningsLabelStyles() {
@@ -464,75 +495,30 @@ public class JavaFXTemplate extends Application {
         startNewRound();
     }
 
-    private void toggleTheme() {
-        gameScene.getStylesheets().clear();
-        if ("default".equals(currentTheme)) {
-            currentTheme = "dark";
-            String css = getClass().getResource("/dark.css").toExternalForm();
-            gameScene.getStylesheets().add(css);
-        } else {
-            currentTheme = "default";
-            String css = getClass().getResource("/default.css").toExternalForm();
-            gameScene.getStylesheets().add(css);
-        }
-    }
-
     private TextField createStyledTextField(String prompt) {
         TextField field = new TextField();
         field.setPromptText(prompt);
-        field.setStyle("-fx-background-color: #333333; "
-                + "-fx-text-fill: white; "
-                + "-fx-border-color: #4CAF50; "
-                + "-fx-border-width: 1px; "
-                + "-fx-border-radius: 3px;");
+        field.getStyleClass().add("styled-textfield");
         return field;
     }
 
+    // Modified button creation method
     private Button createStyledButton(String text, String color) {
         Button button = new Button(text);
-        if (text.equals("Play")) {
-            button.setStyle("-fx-background-color: " + color + "; "
-                    + "-fx-text-fill: white; "
-                    + "-fx-font-size: 14px; "
-                    + "-fx-min-width: 60px; "
-                    + "-fx-background-radius: 3px;");
-        } else if (text.equals("Fold")) {
-            button.setStyle("-fx-background-color: " + color + "; "
-                    + "-fx-text-fill: white; "
-                    + "-fx-font-size: 14px; "
-                    + "-fx-min-width: 60px; "
-                    + "-fx-background-radius: 3px;");
-        } else {
-            button.setStyle("-fx-background-color: " + color + "; "
-                    + "-fx-text-fill: white; "
-                    + "-fx-font-size: 14px; "
-                    + "-fx-background-radius: 3px;");
+        button.getStyleClass().clear();  // Clear default styles
+        button.getStyleClass().add("game-button");
+
+        switch (text) {
+            case "Play":
+                button.getStyleClass().add("play-button");
+                break;
+            case "Fold":
+                button.getStyleClass().add("fold-button");
+                break;
+            default:
+                button.getStyleClass().add("default-button");
+                break;
         }
-
-        // Add hover effect
-        button.setOnMouseEntered(e -> {
-            if (color.equals("#4CAF50")) {
-                button.setStyle("-fx-background-color: #45a049; "
-                        + "-fx-text-fill: white; "
-                        + "-fx-font-size: 14px; "
-                        + "-fx-min-width: 60px; "
-                        + "-fx-background-radius: 3px;");
-            } else if (color.equals("#f44336")) {
-                button.setStyle("-fx-background-color: #d32f2f; "
-                        + "-fx-text-fill: white; "
-                        + "-fx-font-size: 14px; "
-                        + "-fx-min-width: 60px; "
-                        + "-fx-background-radius: 3px;");
-            }
-        });
-
-        button.setOnMouseExited(e -> {
-            button.setStyle("-fx-background-color: " + color + "; "
-                    + "-fx-text-fill: white; "
-                    + "-fx-font-size: 14px; "
-                    + "-fx-min-width: 60px; "
-                    + "-fx-background-radius: 3px;");
-        });
 
         return button;
     }
@@ -548,13 +534,13 @@ public class JavaFXTemplate extends Application {
             try {
                 int anteBet = Integer.parseInt(player1AnteField.getText());
                 int pairPlusBet = 0;
-
+    
                 // Validate ante bet
                 if (anteBet < 5 || anteBet > 25) {
                     gameInfoLabel.setText("Ante bet must be between $5 and $25");
                     return;
                 }
-
+    
                 // Validate pair plus bet if entered
                 if (!player1PairPlusField.getText().isEmpty()) {
                     pairPlusBet = Integer.parseInt(player1PairPlusField.getText());
@@ -563,22 +549,22 @@ public class JavaFXTemplate extends Application {
                         return;
                     }
                 }
-
+    
                 playerOne.anteBet = anteBet;
                 playerOne.pairPlusBet = pairPlusBet;
                 player1InitialBetMade = true;
-
+    
                 // Update UI for play decision
                 player1AnteField.setDisable(true);
                 player1PairPlusField.setDisable(true);
                 player1PlayButton.setText("Make Play Bet (" + anteBet + ")");
                 player1FoldButton.setText("Fold");
-
+    
                 // Show player's cards
                 revealPlayer1Cards();
-
+    
                 checkInitialBets();
-
+    
             } catch (NumberFormatException e) {
                 gameInfoLabel.setText("Please enter valid bets");
                 return;
@@ -586,36 +572,39 @@ public class JavaFXTemplate extends Application {
         } else {
             // Handle play decision
             if (isPlay) {
-                // Make play bet equal to ante
                 playerOne.playBet = playerOne.anteBet;
             } else {
-                // Player folded
                 playerOne.anteBet = 0;
                 playerOne.playBet = 0;
                 playerOne.pairPlusBet = 0;
             }
-
+    
             player1PlayDecisionMade = true;
-            player1PlayButton.setDisable(true);
-            player1FoldButton.setDisable(true);
-
+            // Instead of disabling, we'll keep the buttons enabled but styled as disabled
+            player1PlayButton.setDisable(true);  // This will trigger the CSS disabled state
+            player1FoldButton.setDisable(true);   // This will trigger the CSS disabled state
+            
+            // Optional: Add a visual indicator that the decision is locked in
+            player1PlayButton.setText(isPlay ? "Play Bet Made" : "Folded");
+            player1FoldButton.setText(isPlay ? "Play Bet Made" : "Folded");
+    
             checkPlayDecisions();
         }
     }
-
+    
     private void handlePlayer2Action(boolean isPlay) {
         if (!player2InitialBetMade) {
             // Handle initial ante and pair plus bets
             try {
                 int anteBet = Integer.parseInt(player2AnteField.getText());
                 int pairPlusBet = 0;
-
+    
                 // Validate ante bet
                 if (anteBet < 5 || anteBet > 25) {
                     gameInfoLabel.setText("Ante bet must be between $5 and $25");
                     return;
                 }
-
+    
                 // Validate pair plus bet if entered
                 if (!player2PairPlusField.getText().isEmpty()) {
                     pairPlusBet = Integer.parseInt(player2PairPlusField.getText());
@@ -624,22 +613,22 @@ public class JavaFXTemplate extends Application {
                         return;
                     }
                 }
-
+    
                 playerTwo.anteBet = anteBet;
                 playerTwo.pairPlusBet = pairPlusBet;
                 player2InitialBetMade = true;
-
+    
                 // Update UI for play decision
                 player2AnteField.setDisable(true);
                 player2PairPlusField.setDisable(true);
                 player2PlayButton.setText("Make Play Bet (" + anteBet + ")");
                 player2FoldButton.setText("Fold");
-
+    
                 // Show player's cards
                 revealPlayer2Cards();
-
+    
                 checkInitialBets();
-
+    
             } catch (NumberFormatException e) {
                 gameInfoLabel.setText("Please enter valid bets");
                 return;
@@ -647,19 +636,22 @@ public class JavaFXTemplate extends Application {
         } else {
             // Handle play decision
             if (isPlay) {
-                // Make play bet equal to ante
                 playerTwo.playBet = playerTwo.anteBet;
             } else {
-                // Player folded
                 playerTwo.anteBet = 0;
                 playerTwo.playBet = 0;
                 playerTwo.pairPlusBet = 0;
             }
-
+    
             player2PlayDecisionMade = true;
-            player2PlayButton.setDisable(true);
-            player2FoldButton.setDisable(true);
-
+            // Instead of disabling, we'll keep the buttons enabled but styled as disabled
+            player2PlayButton.setDisable(true);  // This will trigger the CSS disabled state
+            player2FoldButton.setDisable(true);   // This will trigger the CSS disabled state
+            
+            // Optional: Add a visual indicator that the decision is locked in
+            player2PlayButton.setText(isPlay ? "Play Bet Made" : "Folded");
+            player2FoldButton.setText(isPlay ? "Play Bet Made" : "Folded");
+    
             checkPlayDecisions();
         }
     }
@@ -878,11 +870,11 @@ public class JavaFXTemplate extends Application {
     private void updateWinningsDisplays() {
         player1TotalWinningsLabel.setStyle("-fx-text-fill: #00ff00; -fx-font-size: 14px; -fx-font-weight: bold;");
         player2TotalWinningsLabel.setStyle("-fx-text-fill: #00ff00; -fx-font-size: 14px; -fx-font-weight: bold;");
-    
+
         // Only display the positive winnings
         player1TotalWinningsLabel.setText(String.format("Total Winnings: $%d", Math.max(0, playerOne.totalWinnings)));
         player2TotalWinningsLabel.setText(String.format("Total Winnings: $%d", Math.max(0, playerTwo.totalWinnings)));
-        
+
         // Remove these lines as the labels are already added in createGameScreen()
         // player1Area.getChildren().add(1, player1PushedAntesLabel);
         // player2Area.getChildren().add(1, player2PushedAntesLabel);
@@ -901,11 +893,16 @@ public class JavaFXTemplate extends Application {
         player2PlayButton.setDisable(!enabled);
         player2FoldButton.setDisable(!enabled);
     }
-
     private void showGameScreen() {
         primaryStage.setScene(gameScene);
         primaryStage.setTitle("Three Card Poker - Game");
         startNewRound();
+        
+        // Ensure menu stays visible by re-applying styles if needed
+        if (gameScene.getStylesheets().isEmpty()) {
+            String css = getClass().getResource("/css/dark-theme.css").toExternalForm();
+            gameScene.getStylesheets().add(css);
+        }
     }
 
     private void showStartScreen() {

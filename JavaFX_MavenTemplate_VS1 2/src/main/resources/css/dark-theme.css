@@ -1,0 +1,164 @@
+/* Base/Root styles */
+.root {
+  -fx-background-color: #1a1a1a;
+}
+
+/* ScrollPane styling */
+.scroll-pane {
+  -fx-background: #1a1a1a;
+  -fx-background-color: #1a1a1a;
+  -fx-control-inner-background: #1a1a1a;
+}
+
+.scroll-pane > .viewport {
+  -fx-background-color: #1a1a1a;
+}
+
+/* Menu styling */
+.menu-bar {
+  -fx-background-color: #333333;
+  -fx-padding: 3px;
+}
+
+.menu {
+  -fx-padding: 3px 6px;
+}
+
+.menu > .label {
+  -fx-text-fill: white;
+}
+
+.menu-item {
+  -fx-background-color: #333333;
+  -fx-padding: 5px 10px;
+}
+
+.menu-item .label {
+  -fx-text-fill: white;
+}
+
+.menu-item:hover {
+  -fx-background-color: #4CAF50;
+}
+
+/* Button styles */
+.game-button {
+  -fx-text-fill: white;
+  -fx-font-size: 14px;
+  -fx-min-width: 60px;
+  -fx-background-radius: 3px;
+  -fx-font-weight: bold;
+  -fx-alignment: center;
+  -fx-text-alignment: center;
+}
+
+.play-button {
+  -fx-background-color: #4CAF50;
+}
+
+.play-button:hover {
+  -fx-background-color: #45a049;
+}
+
+.fold-button {
+  -fx-background-color: #f44336;
+}
+
+.fold-button:hover {
+  -fx-background-color: #d32f2f;
+}
+
+.primary-button {
+  -fx-background-color: #4CAF50;
+  -fx-text-fill: white;
+  -fx-font-size: 14px;
+  -fx-padding: 10 20 10 20;
+  -fx-min-width: 200px;
+}
+
+.primary-button:hover {
+  -fx-background-color: #45a049;
+}
+
+.danger-button {
+  -fx-background-color: #f44336;
+  -fx-text-fill: white;
+  -fx-font-size: 14px;
+  -fx-padding: 10 20 10 20;
+  -fx-min-width: 200px;
+}
+
+.danger-button:hover {
+  -fx-background-color: #d32f2f;
+}
+
+/* Label styles */
+.title-text {
+  -fx-font-family: "Arial";
+  -fx-font-size: 36px;
+  -fx-fill: white;
+}
+
+.game-info-label {
+  -fx-text-fill: #00ff00;
+  -fx-font-size: 18px;
+}
+
+.dealer-label {
+  -fx-text-fill: white;
+  -fx-font-size: 16px;
+}
+
+.player-label {
+  -fx-text-fill: white;
+}
+
+.winnings-label {
+  -fx-text-fill: #00ff00;
+  -fx-font-size: 14px;
+  -fx-font-weight: bold;
+}
+
+.pushed-antes-label {
+  -fx-text-fill: yellow;
+  -fx-font-size: 14px;
+}
+
+/* Player area styling */
+.player-area {
+  -fx-padding: 10px;
+  -fx-border-color: #333333;
+}
+
+/* Container styles */
+.card-container {
+  -fx-spacing: 10;
+  -fx-alignment: center;
+}
+
+.button-container {
+  -fx-spacing: 10;
+  -fx-alignment: center;
+}
+
+/* TextField styles */
+.styled-textfield {
+  -fx-background-color: #333333;
+  -fx-text-fill: white;
+  -fx-border-color: #4CAF50;
+  -fx-border-width: 1px;
+  -fx-border-radius: 3px;
+}
+
+/* Disabled button states */
+.game-button:disabled {
+  -fx-opacity: 0.7;
+}
+
+.play-button:disabled {
+  -fx-background-color: #76ab78;
+}
+
+.fold-button:disabled {
+  -fx-background-color: #c17b74;
+}

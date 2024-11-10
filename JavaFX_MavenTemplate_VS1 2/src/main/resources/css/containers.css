@@ -1,0 +1,50 @@
+/* Root container */
+.root {
+  -fx-background-color: #1a1a1a !important;
+}
+
+/* ScrollPane styling */
+.scroll-pane {
+  -fx-background: #1a1a1a !important;
+  -fx-background-color: #1a1a1a !important;
+}
+
+.scroll-pane > .viewport {
+  -fx-background-color: #1a1a1a !important;
+}
+
+/* ScrollBar styling */
+.scroll-bar:vertical,
+.scroll-bar:horizontal {
+  -fx-background-color: #1a1a1a !important;
+}
+
+.scroll-bar:vertical .thumb,
+.scroll-bar:horizontal .thumb {
+  -fx-background-color: #333333 !important;
+  -fx-background-radius: 5em !important;
+}
+
+.scroll-bar:vertical .track,
+.scroll-bar:horizontal .track {
+  -fx-background-color: #1a1a1a !important;
+  -fx-border-color: #1a1a1a !important;
+}
+
+/* Player areas */
+.player-area {
+  -fx-padding: 10px !important;
+  -fx-border-color: #333333 !important;
+  -fx-spacing: 10 !important;
+}
+
+/* Card and button containers */
+.card-container {
+  -fx-spacing: 10 !important;
+  -fx-alignment: center !important;
+}
+
+.button-container {
+  -fx-spacing: 10 !important;
+  -fx-alignment: center !important;
+}
