@@ -4,30 +4,75 @@ import java.util.Collections;
 
 public class ThreeCardLogic {
 
+    // Hand rankings from highest to lowest
+    private static final int STRAIGHT_FLUSH = 1;
+    private static final int THREE_OF_A_KIND = 2;
+    private static final int STRAIGHT = 3;
+    private static final int FLUSH = 4;
+    private static final int PAIR = 5;
+    private static final int HIGH_CARD = 0;
+
     public static int evalHand(ArrayList<Card> hand) {
         if (hand.size() != 3) {
-            return 0; // Invalid hand
+            return HIGH_CARD;
         }
-        if (isFlush(hand) && isStraight(hand)) {
-            return 1; // Straight flush
 
-                }if (isThreeOfAKind(hand)) {
-            return 2;              // Three of a kind
+        // Check from highest ranking to lowest
+        if (isStraightFlush(hand)) {
+            return STRAIGHT_FLUSH;
+        }
+        if (isThreeOfAKind(hand)) {
+            return THREE_OF_A_KIND;  // This should be checked before Straight
 
                 }if (isStraight(hand)) {
-            return 3;                  // Straight
+            return STRAIGHT;
+        }
+        if (isFlush(hand)) {
+            return FLUSH;
+        }
+        if (isPair(hand)) {
+            return PAIR;
+        }
+        return HIGH_CARD;
+    }
 
-                }if (isFlush(hand)) {
-            return 4;                     // Flush
+    private static boolean isThreeOfAKind(ArrayList<Card> hand) {
+        ArrayList<Integer> values = new ArrayList<>();
+        for (Card card : hand) {
+            values.add(card.getValue());
+        }
 
-                }if (isPair(hand)) {
-            return 5;                      // Pair
+        // Count occurrences of each value
+        int firstValue = values.get(0);
+        int secondValue = values.get(1);
 
-                }return 0;                                       // High card
+        // If all three values are the same
+        if (firstValue == secondValue && secondValue == values.get(2)) {
+            return true;
+        }
+        return false;
+    }
+
+    private static boolean isPair(ArrayList<Card> hand) {
+        if (isThreeOfAKind(hand)) {
+            return false;  // Don't count three of a kind as a pair
+        }
+        ArrayList<Integer> values = new ArrayList<>();
+        for (Card card : hand) {
+            values.add(card.getValue());
+        }
+
+        // Check each possible pair combination
+        return values.get(0).equals(values.get(1))
+                || values.get(1).equals(values.get(2))
+                || values.get(0).equals(values.get(2));
+    }
+
+    private static boolean isStraightFlush(ArrayList<Card> hand) {
+        return isFlush(hand) && isStraight(hand);
     }
 
     private static boolean isFlush(ArrayList<Card> hand) {
-        // All cards must have the same suit
         char suit = hand.get(0).getSuit();
         for (Card card : hand) {
             if (card.getSuit() != suit) {
@@ -38,66 +83,53 @@ public class ThreeCardLogic {
     }
 
     private static boolean isStraight(ArrayList<Card> hand) {
-        // Get the values and sort them
         ArrayList<Integer> values = new ArrayList<>();
         for (Card card : hand) {
             values.add(card.getValue());
         }
         Collections.sort(values);
 
-        // Special case for Ace-2-3
+        // Special case: Ace-2-3
         if (values.get(0) == 2 && values.get(1) == 3 && values.get(2) == 14) {
             return true;
         }
 
-        // Normal case: check if values are consecutive
-        return values.get(2) == values.get(1) + 1
-                && values.get(1) == values.get(0) + 1;
-    }
-
-    private static boolean isThreeOfAKind(ArrayList<Card> hand) {
-        // All three cards must have the same value
-        return hand.get(0).getValue() == hand.get(1).getValue()
-                && hand.get(1).getValue() == hand.get(2).getValue();
-    }
-
-    private static boolean isPair(ArrayList<Card> hand) {
-        // Check each possible pair combination
-        return hand.get(0).getValue() == hand.get(1).getValue()
-                || hand.get(1).getValue() == hand.get(2).getValue()
-                || hand.get(0).getValue() == hand.get(2).getValue();
-    }
-
-    public static int evalPPWinnings(ArrayList<Card> hand, int bet) {
-        int handValue = evalHand(hand);
-        switch (handValue) {
-            case 1:
-                return bet * 40; // Straight flush
-            case 2:
-                return bet * 30; // Three of a kind
-            case 3:
-                return bet * 6;  // Straight
-            case 4:
-                return bet * 3;  // Flush
-            case 5:
-                return bet;      // Pair
-            default:
-                return 0;       // Lost bet
-        }
+        // Normal case: three consecutive values
+        return values.get(1) == values.get(0) + 1
+                && values.get(2) == values.get(1) + 1;
     }
 
     public static int compareHands(ArrayList<Card> dealer, ArrayList<Card> player) {
-        // First compare hand types
-        int dealerHandValue = evalHand(dealer);
-        int playerHandValue = evalHand(player);
+        int dealerRank = evalHand(dealer);
+        int playerRank = evalHand(player);
 
-        if (dealerHandValue < playerHandValue) {
-            return 2; // Player wins
+        // First check if both are high card hands
+        if (dealerRank == HIGH_CARD && playerRank == HIGH_CARD) {
+            return compareHighCards(dealer, player);
+        }
 
-                }if (dealerHandValue > playerHandValue) {
+        // Otherwise, compare hand rankings
+        // Note: Lower number means better hand
+        if (dealerRank != HIGH_CARD && playerRank == HIGH_CARD) {
+            return 1; // Dealer wins because they have a ranked hand vs high card
+        }
+        if (dealerRank == HIGH_CARD && playerRank != HIGH_CARD) {
+            return 2; // Player wins because they have a ranked hand vs high card
+        }
+
+        // If both have ranked hands, lower number wins
+        if (dealerRank < playerRank) {
             return 1; // Dealer wins
         }
-        // If same hand type, compare high cards
+        if (dealerRank > playerRank) {
+            return 2; // Player wins
+        }
+
+        // If they have the same type of hand, compare high cards
+        return compareHighCards(dealer, player);
+    }
+
+    private static int compareHighCards(ArrayList<Card> dealer, ArrayList<Card> player) {
         ArrayList<Integer> dealerValues = new ArrayList<>();
         ArrayList<Integer> playerValues = new ArrayList<>();
 
@@ -114,7 +146,7 @@ public class ThreeCardLogic {
         Collections.sort(playerValues, Collections.reverseOrder());
 
         // Compare each card, starting with highest
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < dealerValues.size(); i++) {
             if (dealerValues.get(i) > playerValues.get(i)) {
                 return 1;
             }
@@ -124,5 +156,130 @@ public class ThreeCardLogic {
         }
 
         return 0; // It's a tie
+    }
+
+    private static boolean dealerQualifies(ArrayList<Card> hand) {
+        ArrayList<Integer> values = new ArrayList<>();
+        for (Card card : hand) {
+            values.add(card.getValue());
+        }
+        Collections.sort(values, Collections.reverseOrder());
+        return values.get(0) >= 12; // Queen or better
+    }
+
+    public static String determineWinner(ArrayList<Card> dealerHand, ArrayList<Card> playerHand, int anteBet, int playBet) {
+        StringBuilder result = new StringBuilder();
+
+        // Add hand descriptions
+        result.append("Your hand: ").append(describeHand(playerHand)).append("\n");
+        result.append("Dealer's hand: ").append(describeHand(dealerHand)).append("\n");
+
+        // First check if dealer qualifies (Queen high or better)
+        if (!dealerQualifies(dealerHand)) {
+            result.append("Dealer does not qualify - Queen high or better required.\n");
+            result.append("Play bet is returned and Ante pushes to next hand.\n");
+            return result.toString();
+        }
+
+        int comparison = compareHands(dealerHand, playerHand);
+        if (comparison == 1) {
+            result.append("Dealer wins! ");
+            result.append(getHandTypeName(evalHand(dealerHand))).append(" beats ");
+            result.append(getHandTypeName(evalHand(playerHand))).append("\n");
+            result.append("You lose $").append(anteBet + playBet);
+        } else if (comparison == 2) {
+            result.append("You win! ");
+            result.append(getHandTypeName(evalHand(playerHand))).append(" beats ");
+            result.append(getHandTypeName(evalHand(dealerHand))).append("\n");
+            int winnings = (anteBet + playBet) * 2;
+            result.append("You win $").append(winnings);
+        } else {
+            result.append("It's a tie!\nBets are returned");
+        }
+
+        return result.toString();
+    }
+
+    public static int evalPPWinnings(ArrayList<Card> hand, int bet) {
+        if (bet == 0) {
+            return 0;
+        }
+
+        int handType = evalHand(hand);
+        if (handType == STRAIGHT_FLUSH) {
+            return bet * 40; 
+        }else if (handType == THREE_OF_A_KIND) {
+            return bet * 30; 
+        }else if (handType == STRAIGHT) {
+            return bet * 6; 
+        }else if (handType == FLUSH) {
+            return bet * 3; 
+        }else if (handType == PAIR) {
+            return bet; 
+        }else {
+            return 0;
+        }
+    }
+
+    private static String getHandTypeName(int handType) {
+        if (handType == STRAIGHT_FLUSH) {
+            return "Straight Flush"; 
+        }else if (handType == THREE_OF_A_KIND) {
+            return "Three of a Kind"; 
+        }else if (handType == STRAIGHT) {
+            return "Straight"; 
+        }else if (handType == FLUSH) {
+            return "Flush"; 
+        }else if (handType == PAIR) {
+            return "Pair"; 
+        }else {
+            return "High Card";
+        }
+    }
+
+    private static String describeHand(ArrayList<Card> hand) {
+        StringBuilder desc = new StringBuilder();
+        ArrayList<Card> sortedHand = new ArrayList<>(hand);
+        sortedHand.sort((a, b) -> b.getValue() - a.getValue());
+
+        for (int i = 0; i < sortedHand.size(); i++) {
+            if (i > 0) {
+                desc.append(", ");
+            }
+            desc.append(getCardName(sortedHand.get(i)));
+        }
+
+        desc.append(" (").append(getHandTypeName(evalHand(hand))).append(")");
+        return desc.toString();
+    }
+
+    private static String getCardName(Card card) {
+        String value;
+        if (card.getValue() == 14) {
+            value = "Ace"; 
+        }else if (card.getValue() == 13) {
+            value = "King"; 
+        }else if (card.getValue() == 12) {
+            value = "Queen"; 
+        }else if (card.getValue() == 11) {
+            value = "Jack"; 
+        }else {
+            value = String.valueOf(card.getValue());
+        }
+
+        String suit;
+        if (card.getSuit() == 'H') {
+            suit = "♥"; 
+        }else if (card.getSuit() == 'D') {
+            suit = "♦"; 
+        }else if (card.getSuit() == 'C') {
+            suit = "♣"; 
+        }else if (card.getSuit() == 'S') {
+            suit = "♠"; 
+        }else {
+            suit = String.valueOf(card.getSuit());
+        }
+
+        return value + suit;
     }
 }

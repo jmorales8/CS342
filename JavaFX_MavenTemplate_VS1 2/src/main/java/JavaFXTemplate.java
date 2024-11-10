@@ -1,5 +1,6 @@
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -34,10 +35,15 @@ public class JavaFXTemplate extends Application {
     }
     private GameState currentState;
 
-    // Game UI components
+    // Game state tracking
+    private boolean player1Submitted = false;
+    private boolean player2Submitted = false;
+    private ArrayList<Card> dealerHand;
+    private ArrayList<Card> player1Hand;
+    private ArrayList<Card> player2Hand;
+
+    // UI Components
     private Button dealButton;
-    private VBox player1Area;
-    private VBox player2Area;
     private HBox dealerCards;
     private HBox player1Cards;
     private HBox player2Cards;
@@ -54,6 +60,13 @@ public class JavaFXTemplate extends Application {
     private TextField player2PairPlusField;
     private Button player2PlayButton;
     private Button player2FoldButton;
+
+    // Additional UI elements
+    private HBox playAgainBox;
+    private VBox player1Area;
+    private VBox player2Area;
+    private Label player1TotalWinningsLabel;
+    private Label player2TotalWinningsLabel;
 
     @Override
     public void start(Stage primaryStage) {
@@ -89,11 +102,14 @@ public class JavaFXTemplate extends Application {
         startButton.setStyle(buttonStyle);
         exitButton.setStyle(buttonStyle.replace("#4CAF50", "#f44336"));
 
-        startButton.setOnAction(e -> showGameScreen());
+        startButton.setOnAction(e -> {
+            showGameScreen();
+            startNewRound(); // Start a new round immediately when game screen is shown
+        });
         exitButton.setOnAction(e -> Platform.exit());
 
         startRoot.getChildren().addAll(titleText, startButton, exitButton);
-        startScene = new Scene(startRoot, 1000, 800);
+        startScene = new Scene(startRoot, 1200, 800);
     }
 
     private void createGameScreen() {
@@ -107,28 +123,14 @@ public class JavaFXTemplate extends Application {
                 + "-fx-background-color: #1a1a1a; "
                 + "-fx-control-inner-background: #1a1a1a;"
         );
-        scrollPane.setFitToWidth(true);  // Makes content fit the width of the scroll pane
-
-        // Set ScrollPane styling programmatically
-        String scrollPaneStyle
-                = ".scroll-pane { -fx-background-color: #1a1a1a; }"
-                + ".scroll-pane > .viewport { -fx-background-color: #1a1a1a; }"
-                + ".scroll-bar:vertical, .scroll-bar:horizontal { -fx-background-color: #1a1a1a; }"
-                + ".scroll-bar:vertical .thumb, .scroll-bar:horizontal .thumb { "
-                + "    -fx-background-color: #333333; -fx-background-radius: 5em; }"
-                + ".scroll-bar:vertical .track, .scroll-bar:horizontal .track { "
-                + "    -fx-background-color: #1a1a1a; -fx-border-color: #1a1a1a; }"
-                + ".scroll-bar .increment-button, .scroll-bar .decrement-button { "
-                + "    -fx-background-color: #1a1a1a; -fx-border-color: #1a1a1a; }"
-                + ".scroll-bar .increment-arrow, .scroll-bar .decrement-arrow { "
-                + "    -fx-background-color: white; }";
+        scrollPane.setFitToWidth(true);
 
         // Main content container
         VBox mainContent = new VBox(20);
         mainContent.setPadding(new Insets(20));
         mainContent.setStyle("-fx-background-color: #1a1a1a;");
 
-        // Dealer area at top
+        // Dealer area at top with title
         VBox dealerArea = new VBox(10);
         dealerArea.setAlignment(Pos.CENTER);
         Label dealerLabel = new Label("Dealer's Cards");
@@ -138,44 +140,14 @@ public class JavaFXTemplate extends Application {
         dealerArea.getChildren().addAll(dealerLabel, dealerCards);
 
         // Game info display
-        gameInfoLabel = new Label("Game Info");
+        gameInfoLabel = new Label("Players: Place your bets");
         gameInfoLabel.setStyle("-fx-text-fill: #00ff00; -fx-font-size: 18px;");
         dealerArea.getChildren().add(gameInfoLabel);
 
-        // Player areas
-        setupPlayerAreas();
+        // Create horizontal container for both players
+        HBox playersContainer = new HBox(50);
+        playersContainer.setAlignment(Pos.CENTER);
 
-        // Top bar with back button and deal button
-        VBox topBar = new VBox(10);
-        topBar.setAlignment(Pos.CENTER);
-        topBar.setPadding(new Insets(10));
-        Button backButton = new Button("Back to Menu");
-        backButton.setStyle("-fx-background-color: #f44336; -fx-text-fill: white;");
-        backButton.setOnAction(e -> showStartScreen());
-
-        dealButton = new Button("Deal");
-        dealButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
-        dealButton.setOnAction(e -> startNewRound());
-
-        topBar.getChildren().addAll(backButton, dealButton);
-
-        // Add everything to the main content
-        mainContent.getChildren().addAll(dealerArea, player1Area, player2Area);
-
-        // Set up the scroll pane
-        scrollPane.setContent(mainContent);
-
-        // Add components to the root
-        gameRoot.setTop(topBar);
-        gameRoot.setCenter(scrollPane);
-
-        gameScene = new Scene(gameRoot, 1000, 800);
-
-        // Add the styles directly to the scene
-        gameScene.getStylesheets().add("data:text/css," + scrollPaneStyle.replace(" ", "%20"));
-    }
-
-    private void setupPlayerAreas() {
         // Player 1 Area
         player1Area = new VBox(10);
         player1Area.setStyle("-fx-padding: 10px; -fx-border-color: #333333;");
@@ -186,18 +158,18 @@ public class JavaFXTemplate extends Application {
         player1PairPlusField = createStyledTextField("Enter Pair Plus Bet");
         player1PlayButton = createStyledButton("Play", "#4CAF50");
         player1FoldButton = createStyledButton("Fold", "#f44336");
+        player1TotalWinningsLabel = new Label("Total Winnings: $0");
+        player1TotalWinningsLabel.setStyle("-fx-text-fill: #00ff00; -fx-font-size: 14px;");
 
+        HBox player1Buttons = new HBox(10, player1PlayButton, player1FoldButton);
         player1Area.getChildren().addAll(
                 player1Label,
+                player1TotalWinningsLabel,
                 player1Cards,
                 new Label("Ante:"), player1AnteField,
                 new Label("Pair+:"), player1PairPlusField,
-                new HBox(10, player1PlayButton, player1FoldButton)
+                player1Buttons
         );
-
-        // Add event handlers for Player 1 buttons
-        player1PlayButton.setOnAction(e -> handlePlayer1Action(true));
-        player1FoldButton.setOnAction(e -> handlePlayer1Action(false));
 
         // Player 2 Area
         player2Area = new VBox(10);
@@ -209,140 +181,111 @@ public class JavaFXTemplate extends Application {
         player2PairPlusField = createStyledTextField("Enter Pair Plus Bet");
         player2PlayButton = createStyledButton("Play", "#4CAF50");
         player2FoldButton = createStyledButton("Fold", "#f44336");
+        player2TotalWinningsLabel = new Label("Total Winnings: $0");
+        player2TotalWinningsLabel.setStyle("-fx-text-fill: #00ff00; -fx-font-size: 14px;");
 
+        HBox player2Buttons = new HBox(10, player2PlayButton, player2FoldButton);
         player2Area.getChildren().addAll(
                 player2Label,
+                player2TotalWinningsLabel,
                 player2Cards,
                 new Label("Ante:"), player2AnteField,
                 new Label("Pair+:"), player2PairPlusField,
-                new HBox(10, player2PlayButton, player2FoldButton)
+                player2Buttons
         );
 
-        // Add event handlers for Player 2 buttons
+        // Style all labels in player areas
+        for (VBox playerArea : Arrays.asList(player1Area, player2Area)) {
+            playerArea.getChildren().forEach(node -> {
+                if (node instanceof Label) {
+                    ((Label) node).setStyle("-fx-text-fill: white;");
+                }
+            });
+        }
+
+        // Add players to horizontal container
+        playersContainer.getChildren().addAll(player1Area, player2Area);
+
+        // Create deal button and play again label
+        dealButton = new Button("Deal");
+        dealButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 14px;");
+        Label playAgainLabel = new Label("Play Again?");
+        playAgainLabel.setStyle("-fx-text-fill: white; -fx-font-size: 16px;");
+
+        // Create an HBox to hold the play again label and deal button
+        playAgainBox = new HBox(10);
+        playAgainBox.setAlignment(Pos.CENTER);
+        playAgainBox.getChildren().addAll(playAgainLabel, dealButton);
+        playAgainBox.setVisible(false);
+
+        // Top bar setup
+        VBox topBar = new VBox(10);
+        topBar.setAlignment(Pos.CENTER);
+        topBar.setPadding(new Insets(10));
+
+        Button backButton = new Button("Back to Menu");
+        backButton.setStyle("-fx-background-color: #f44336; -fx-text-fill: white;");
+        backButton.setOnAction(e -> showStartScreen());
+
+        dealButton.setOnAction(e -> {
+            playAgainBox.setVisible(false);
+            startNewRound();
+        });
+
+        topBar.getChildren().addAll(backButton, playAgainBox);
+
+        // Add button actions
+        player1PlayButton.setOnAction(e -> handlePlayer1Action(true));
+        player1FoldButton.setOnAction(e -> handlePlayer1Action(false));
         player2PlayButton.setOnAction(e -> handlePlayer2Action(true));
         player2FoldButton.setOnAction(e -> handlePlayer2Action(false));
 
-        // Set initial states
-        setControlsDisabled(true);
-    }
+        // Add everything to the main content
+        mainContent.getChildren().addAll(dealerArea, playersContainer);
 
-    private void startNewRound() {
-        // Deal cards
-        ArrayList<Card> dealerHand = theDealer.dealHand();
-        ArrayList<Card> player1Hand = theDealer.dealHand();
-        ArrayList<Card> player2Hand = theDealer.dealHand();
+        // Set up the scroll pane
+        scrollPane.setContent(mainContent);
 
-        // Display dealer's hand FACE UP (changed from face down)
-        displayHand(dealerCards, dealerHand, false);  // Changed to false to show face up
-        displayHand(player1Cards, player1Hand, false);
-        displayHand(player2Cards, player2Hand, true); // Player 2's hand face down initially
+        // Add components to the root
+        gameRoot.setTop(topBar);
+        gameRoot.setCenter(scrollPane);
 
-        // Set game state
-        currentState = GameState.PLAYER_ONE_TURN;
-        updateGameState();
+        gameScene = new Scene(gameRoot, 1200, 800);
+        dealButton.setOnAction(e -> {
+            playAgainBox.setVisible(false);
 
-        // Disable deal button
-        dealButton.setDisable(true);
-    }
+            // Reset player bets and states
+            playerOne.anteBet = 0;
+            playerOne.playBet = 0;
+            playerOne.pairPlusBet = 0;
+            playerTwo.anteBet = 0;
+            playerTwo.playBet = 0;
+            playerTwo.pairPlusBet = 0;
 
-    private void updateGameState() {
-        switch (currentState) {
-            case PLAYER_ONE_TURN:
-                gameInfoLabel.setText("Player 1's Turn");
-                // Enable Player 1 controls, disable Player 2
-                setPlayer1ControlsEnabled(true);
-                setPlayer2ControlsEnabled(false);
-                // Show Player 1's cards, hide Player 2's
-                setCardsVisible(player1Cards, true);
-                setCardsVisible(player2Cards, false);
-                // Dealer's cards remain visible - no need to change them
-                break;
+            // Reset betting flags
+            player1InitialBetMade = false;
+            player2InitialBetMade = false;
+            player1PlayDecisionMade = false;
+            player2PlayDecisionMade = false;
 
-            case PLAYER_TWO_TURN:
-                gameInfoLabel.setText("Player 2's Turn");
-                // Enable Player 2 controls, disable Player 1
-                setPlayer1ControlsEnabled(false);
-                setPlayer2ControlsEnabled(true);
-                // Show Player 2's cards, hide Player 1's
-                setCardsVisible(player1Cards, false);
-                setCardsVisible(player2Cards, true);
-                // Dealer's cards remain visible - no need to change them
-                break;
+            // Enable all controls
+            setPlayer1ControlsEnabled(true);
+            setPlayer2ControlsEnabled(true);
 
-            case ROUND_COMPLETE:
-                gameInfoLabel.setText("Round Complete");
-                // Show all player cards
-                setCardsVisible(player1Cards, true);
-                setCardsVisible(player2Cards, true);
-                // Dealer's cards are already visible
-                // Disable all controls
-                setControlsDisabled(true);
-                // Enable deal button for next round
-                dealButton.setDisable(false);
-                break;
-        }
-    }
+            // Reset text fields
+            player1AnteField.clear();
+            player1PairPlusField.clear();
+            player2AnteField.clear();
+            player2PairPlusField.clear();
 
-    private void handlePlayer1Action(boolean isPlay) {
-        if (isPlay) {
-            // Handle play action
-            try {
-                playerOne.anteBet = Integer.parseInt(player1AnteField.getText());
-                playerOne.pairPlusBet = Integer.parseInt(player1PairPlusField.getText());
-            } catch (NumberFormatException e) {
-                gameInfoLabel.setText("Please enter valid bets");
-                return;
-            }
-        }
-        // Move to player 2's turn
-        currentState = GameState.PLAYER_TWO_TURN;
-        updateGameState();
-    }
+            // Reset button text
+            player1PlayButton.setText("Play");
+            player2PlayButton.setText("Play");
+            player1FoldButton.setText("Fold");
+            player2FoldButton.setText("Fold");
 
-    private void handlePlayer2Action(boolean isPlay) {
-        if (isPlay) {
-            // Handle play action
-            try {
-                playerTwo.anteBet = Integer.parseInt(player2AnteField.getText());
-                playerTwo.pairPlusBet = Integer.parseInt(player2PairPlusField.getText());
-            } catch (NumberFormatException e) {
-                gameInfoLabel.setText("Please enter valid bets");
-                return;
-            }
-        }
-        // Complete the round
-        currentState = GameState.ROUND_COMPLETE;
-        updateGameState();
-    }
-
-    private void setControlsDisabled(boolean disabled) {
-        setPlayer1ControlsEnabled(!disabled);
-        setPlayer2ControlsEnabled(!disabled);
-    }
-
-    private void setPlayer1ControlsEnabled(boolean enabled) {
-        player1AnteField.setDisable(!enabled);
-        player1PairPlusField.setDisable(!enabled);
-        player1PlayButton.setDisable(!enabled);
-        player1FoldButton.setDisable(!enabled);
-    }
-
-    private void setPlayer2ControlsEnabled(boolean enabled) {
-        player2AnteField.setDisable(!enabled);
-        player2PairPlusField.setDisable(!enabled);
-        player2PlayButton.setDisable(!enabled);
-        player2FoldButton.setDisable(!enabled);
-    }
-
-    private void setCardsVisible(HBox cardArea, boolean visible) {
-        cardArea.getChildren().forEach(node -> {
-            if (node instanceof CardVisual) {
-                if (visible) {
-                    ((CardVisual) node).setFaceUp();
-                } else {
-                    ((CardVisual) node).setFaceDown();
-                }
-            }
+            // Start new round
+            startNewRound();
         });
     }
 
@@ -359,20 +302,341 @@ public class JavaFXTemplate extends Application {
         return button;
     }
 
-    private void displayHand(HBox cardArea, ArrayList<Card> hand, boolean faceDown) {
-        cardArea.getChildren().clear();
-        for (Card card : hand) {
-            CardVisual cardView = new CardVisual(card);
-            if (faceDown) {
-                cardView.setFaceDown();
+    private boolean player1InitialBetMade = false;
+    private boolean player2InitialBetMade = false;
+    private boolean player1PlayDecisionMade = false;
+    private boolean player2PlayDecisionMade = false;
+
+    private void handlePlayer1Action(boolean isPlay) {
+        if (!player1InitialBetMade) {
+            // Handle initial ante and pair plus bets
+            try {
+                int anteBet = Integer.parseInt(player1AnteField.getText());
+                int pairPlusBet = 0;
+
+                // Validate ante bet
+                if (anteBet < 5 || anteBet > 25) {
+                    gameInfoLabel.setText("Ante bet must be between $5 and $25");
+                    return;
+                }
+
+                // Validate pair plus bet if entered
+                if (!player1PairPlusField.getText().isEmpty()) {
+                    pairPlusBet = Integer.parseInt(player1PairPlusField.getText());
+                    if (pairPlusBet < 5 || pairPlusBet > 25) {
+                        gameInfoLabel.setText("Pair Plus bet must be between $5 and $25");
+                        return;
+                    }
+                }
+
+                playerOne.anteBet = anteBet;
+                playerOne.pairPlusBet = pairPlusBet;
+                player1InitialBetMade = true;
+
+                // Update UI for play decision
+                player1AnteField.setDisable(true);
+                player1PairPlusField.setDisable(true);
+                player1PlayButton.setText("Make Play Bet (" + anteBet + ")");
+                player1FoldButton.setText("Fold");
+
+                // Show player's cards
+                revealPlayer1Cards();
+
+                checkInitialBets();
+
+            } catch (NumberFormatException e) {
+                gameInfoLabel.setText("Please enter valid bets");
+                return;
             }
-            cardArea.getChildren().add(cardView);
+        } else {
+            // Handle play decision
+            if (isPlay) {
+                // Make play bet equal to ante
+                playerOne.playBet = playerOne.anteBet;
+            } else {
+                // Player folded
+                playerOne.anteBet = 0;
+                playerOne.playBet = 0;
+                playerOne.pairPlusBet = 0;
+            }
+
+            player1PlayDecisionMade = true;
+            player1PlayButton.setDisable(true);
+            player1FoldButton.setDisable(true);
+
+            checkPlayDecisions();
         }
+    }
+
+    private void handlePlayer2Action(boolean isPlay) {
+        if (!player2InitialBetMade) {
+            // Handle initial ante and pair plus bets
+            try {
+                int anteBet = Integer.parseInt(player2AnteField.getText());
+                int pairPlusBet = 0;
+
+                // Validate ante bet
+                if (anteBet < 5 || anteBet > 25) {
+                    gameInfoLabel.setText("Ante bet must be between $5 and $25");
+                    return;
+                }
+
+                // Validate pair plus bet if entered
+                if (!player2PairPlusField.getText().isEmpty()) {
+                    pairPlusBet = Integer.parseInt(player2PairPlusField.getText());
+                    if (pairPlusBet < 5 || pairPlusBet > 25) {
+                        gameInfoLabel.setText("Pair Plus bet must be between $5 and $25");
+                        return;
+                    }
+                }
+
+                playerTwo.anteBet = anteBet;
+                playerTwo.pairPlusBet = pairPlusBet;
+                player2InitialBetMade = true;
+
+                // Update UI for play decision
+                player2AnteField.setDisable(true);
+                player2PairPlusField.setDisable(true);
+                player2PlayButton.setText("Make Play Bet (" + anteBet + ")");
+                player2FoldButton.setText("Fold");
+
+                // Show player's cards
+                revealPlayer2Cards();
+
+                checkInitialBets();
+
+            } catch (NumberFormatException e) {
+                gameInfoLabel.setText("Please enter valid bets");
+                return;
+            }
+        } else {
+            // Handle play decision
+            if (isPlay) {
+                // Make play bet equal to ante
+                playerTwo.playBet = playerTwo.anteBet;
+            } else {
+                // Player folded
+                playerTwo.anteBet = 0;
+                playerTwo.playBet = 0;
+                playerTwo.pairPlusBet = 0;
+            }
+
+            player2PlayDecisionMade = true;
+            player2PlayButton.setDisable(true);
+            player2FoldButton.setDisable(true);
+
+            checkPlayDecisions();
+        }
+    }
+
+    private void revealPlayer1Cards() {
+        for (javafx.scene.Node node : player1Cards.getChildren()) {
+            if (node instanceof CardVisual) {
+                ((CardVisual) node).setFaceUp();
+            }
+        }
+    }
+
+    private void revealPlayer2Cards() {
+        for (javafx.scene.Node node : player2Cards.getChildren()) {
+            if (node instanceof CardVisual) {
+                ((CardVisual) node).setFaceUp();
+            }
+        }
+    }
+
+    private void checkInitialBets() {
+        if (player1InitialBetMade && player2InitialBetMade) {
+            gameInfoLabel.setText("Players: Review your cards and make play bet or fold");
+        }
+    }
+
+    private void checkPlayDecisions() {
+        if (player1PlayDecisionMade && player2PlayDecisionMade) {
+            // Reveal dealer's cards and evaluate the round
+            revealDealerCards();
+            evaluateRound();
+        }
+    }
+
+    private void startNewRound() {
+        // Reset all betting flags
+        player1InitialBetMade = false;
+        player2InitialBetMade = false;
+        player1PlayDecisionMade = false;
+        player2PlayDecisionMade = false;
+
+        // Deal cards
+        dealerHand = theDealer.dealHand();
+        player1Hand = theDealer.dealHand();
+        player2Hand = theDealer.dealHand();
+
+        // Clear and reset displays
+        dealerCards.getChildren().clear();
+        player1Cards.getChildren().clear();
+        player2Cards.getChildren().clear();
+
+        // Add all cards face down initially
+        for (int i = 0; i < 3; i++) {
+            CardVisual dealerCard = new CardVisual(dealerHand.get(i));
+            CardVisual p1Card = new CardVisual(player1Hand.get(i));
+            CardVisual p2Card = new CardVisual(player2Hand.get(i));
+
+            dealerCard.setFaceDown();
+            p1Card.setFaceDown();
+            p2Card.setFaceDown();
+
+            dealerCards.getChildren().add(dealerCard);
+            player1Cards.getChildren().add(p1Card);
+            player2Cards.getChildren().add(p2Card);
+        }
+
+        // Reset UI
+        resetUI();
+    }
+
+    private void resetUI() {
+        // Clear text fields
+        player1AnteField.clear();
+        player1PairPlusField.clear();
+        player2AnteField.clear();
+        player2PairPlusField.clear();
+
+        // Reset buttons
+        player1PlayButton.setText("Play");
+        player2PlayButton.setText("Play");
+        player1FoldButton.setText("Fold");
+        player2FoldButton.setText("Fold");
+
+        // Enable controls
+        setPlayer1ControlsEnabled(true);
+        setPlayer2ControlsEnabled(true);
+
+        // Reset game info
+        gameInfoLabel.setText("Players: Place your ante bets");
+        playAgainBox.setVisible(false);
+        dealButton.setDisable(true);
+    }
+
+    private void revealDealerCards() {
+        for (javafx.scene.Node node : dealerCards.getChildren()) {
+            if (node instanceof CardVisual) {
+                ((CardVisual) node).setFaceUp();
+            }
+        }
+    }
+
+    private void evaluateRound() {
+        currentState = GameState.ROUND_COMPLETE;
+        StringBuilder finalResult = new StringBuilder("Results:\n\n");
+
+        // Calculate Player 1 results
+        String player1Result = ThreeCardLogic.determineWinner(dealerHand, player1Hand,
+                playerOne.anteBet, playerOne.playBet);
+        int player1PairPlus = ThreeCardLogic.evalPPWinnings(player1Hand, playerOne.pairPlusBet);
+        int player1MainWinnings = calculateMainGameWinnings(player1Result, playerOne.anteBet);
+
+        // Calculate Player 2 results
+        String player2Result = ThreeCardLogic.determineWinner(dealerHand, player2Hand,
+                playerTwo.anteBet, playerTwo.playBet);
+        int player2PairPlus = ThreeCardLogic.evalPPWinnings(player2Hand, playerTwo.pairPlusBet);
+        int player2MainWinnings = calculateMainGameWinnings(player2Result, playerTwo.anteBet);
+
+        // Update totals - only add positive winnings to total
+        if (player1MainWinnings > 0) {
+            playerOne.totalWinnings += player1MainWinnings;
+        }
+        if (player1PairPlus > 0) {
+            playerOne.totalWinnings += player1PairPlus;
+        }
+
+        if (player2MainWinnings > 0) {
+            playerTwo.totalWinnings += player2MainWinnings;
+        }
+        if (player2PairPlus > 0) {
+            playerTwo.totalWinnings += player2PairPlus;
+        }
+
+        // Display results
+        finalResult.append("Player 1:\n");
+        finalResult.append(player1Result).append("\n");
+        if (player1MainWinnings > 0) {
+            finalResult.append("Main Game Winnings: $").append(player1MainWinnings).append("\n");
+        } else if (player1MainWinnings < 0) {
+            finalResult.append("Main Game Loss: $").append(-player1MainWinnings).append("\n");
+        }
+
+        if (player1PairPlus > 0) {
+            finalResult.append("Pair Plus Winnings: $").append(player1PairPlus).append("\n");
+        } else if (playerOne.pairPlusBet > 0) {
+            finalResult.append("Pair Plus Loss: $").append(playerOne.pairPlusBet).append("\n");
+        }
+
+        finalResult.append("\nPlayer 2:\n");
+        finalResult.append(player2Result).append("\n");
+        if (player2MainWinnings > 0) {
+            finalResult.append("Main Game Winnings: $").append(player2MainWinnings).append("\n");
+        } else if (player2MainWinnings < 0) {
+            finalResult.append("Main Game Loss: $").append(-player2MainWinnings).append("\n");
+        }
+
+        if (player2PairPlus > 0) {
+            finalResult.append("Pair Plus Winnings: $").append(player2PairPlus).append("\n");
+        } else if (playerTwo.pairPlusBet > 0) {
+            finalResult.append("Pair Plus Loss: $").append(playerTwo.pairPlusBet).append("\n");
+        }
+
+        // Update displays
+        updateWinningsDisplays();
+        gameInfoLabel.setText(finalResult.toString());
+        playAgainBox.setVisible(true);
+        dealButton.setDisable(false);
+    }
+
+    private int calculateMainGameWinnings(String result, int anteBet) {
+        if (result.contains("Dealer does not qualify")) {
+            // Play bet is returned, ante pushes
+            return anteBet; // Return the play bet only
+        } else if (result.contains("win")) {
+            // Player wins 1:1 on both ante and play
+            return (anteBet * 4); // Win both bets plus original bets back (anteBet * 2 for each bet)
+        } else if (result.contains("lose")) {
+            // Lose both ante and play bets
+            return -(anteBet * 2); // Indicate loss but don't subtract from total
+        } else if (result.contains("tie")) {
+            // Bets are returned
+            return 0;
+        }
+        return 0;
+    }
+
+    private void updateWinningsDisplays() {
+        // Always use green since we're only showing winnings now
+        player1TotalWinningsLabel.setStyle("-fx-text-fill: #00ff00; -fx-font-size: 14px; -fx-font-weight: bold;");
+        player2TotalWinningsLabel.setStyle("-fx-text-fill: #00ff00; -fx-font-size: 14px; -fx-font-weight: bold;");
+
+        player1TotalWinningsLabel.setText(String.format("Total Winnings: $%d", playerOne.totalWinnings));
+        player2TotalWinningsLabel.setText(String.format("Total Winnings: $%d", playerTwo.totalWinnings));
+    }
+
+    private void setPlayer1ControlsEnabled(boolean enabled) {
+        player1AnteField.setDisable(!enabled);
+        player1PairPlusField.setDisable(!enabled);
+        player1PlayButton.setDisable(!enabled);
+        player1FoldButton.setDisable(!enabled);
+    }
+
+    private void setPlayer2ControlsEnabled(boolean enabled) {
+        player2AnteField.setDisable(!enabled);
+        player2PairPlusField.setDisable(!enabled);
+        player2PlayButton.setDisable(!enabled);
+        player2FoldButton.setDisable(!enabled);
     }
 
     private void showGameScreen() {
         primaryStage.setScene(gameScene);
         primaryStage.setTitle("Three Card Poker - Game");
+        startNewRound();
     }
 
     private void showStartScreen() {

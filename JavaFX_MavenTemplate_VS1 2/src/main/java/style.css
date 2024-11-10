@@ -34,4 +34,6 @@
   -fx-background-color: white;
 }
 
-/* mvn clean compile exec:java */
+/*
+mvn clean compile exec:java 
+*/
