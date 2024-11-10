@@ -1,0 +1,60 @@
+.root {
+  -fx-background-color: #2c003e;
+}
+
+.button {
+  -fx-background-color: #ff9100;
+  -fx-text-fill: black;
+  -fx-font-size: 14px;
+  -fx-padding: 8 15 8 15;
+  -fx-background-radius: 20;
+  -fx-effect: dropshadow(three-pass-box, rgba(255,145,0,0.6), 10, 0, 0, 0);
+}
+
+.button:hover {
+  -fx-background-color: #ffab40;
+  -fx-effect: dropshadow(three-pass-box, rgba(255,145,0,0.8), 15, 0, 0, 0);
+}
+
+.text-field {
+  -fx-background-color: #3d005b;
+  -fx-text-fill: #ff9100;
+  -fx-font-size: 14px;
+  -fx-border-color: #ff9100;
+  -fx-border-radius: 5;
+  -fx-background-radius: 5;
+}
+
+.label {
+  -fx-text-fill: #ff9100;
+  -fx-font-size: 14px;
+  -fx-font-family: "Segoe UI";
+}
+
+.menu-bar {
+  -fx-background-color: #3d005b;
+}
+
+.menu {
+  -fx-background-color: transparent;
+}
+
+.menu-item {
+  -fx-background-color: #3d005b;
+}
+
+.menu .label {
+  -fx-text-fill: #ff9100;
+}
+
+.menu-item .label {
+  -fx-text-fill: #ff9100;
+}
+
+.menu-item:hover {
+  -fx-background-color: #ff9100;
+}
+
+.menu-item:hover .label {
+  -fx-text-fill: black;
+}

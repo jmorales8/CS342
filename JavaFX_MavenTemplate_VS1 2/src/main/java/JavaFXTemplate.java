@@ -6,16 +6,22 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
 public class JavaFXTemplate extends Application {
@@ -67,6 +73,8 @@ public class JavaFXTemplate extends Application {
     private VBox player2Area;
     private Label player1TotalWinningsLabel;
     private Label player2TotalWinningsLabel;
+    private Scene exitScene;
+    private String currentTheme = "default";
 
     @Override
     public void start(Stage primaryStage) {
@@ -158,8 +166,9 @@ public class JavaFXTemplate extends Application {
         player1PairPlusField = createStyledTextField("Enter Pair Plus Bet");
         player1PlayButton = createStyledButton("Play", "#4CAF50");
         player1FoldButton = createStyledButton("Fold", "#f44336");
+// Now add the total winnings labels with their green style
         player1TotalWinningsLabel = new Label("Total Winnings: $0");
-        player1TotalWinningsLabel.setStyle("-fx-text-fill: #00ff00; -fx-font-size: 14px;");
+        player1TotalWinningsLabel.setStyle("-fx-text-fill: #00ff00; -fx-font-size: 14px; -fx-font-weight: bold;");
 
         HBox player1Buttons = new HBox(10, player1PlayButton, player1FoldButton);
         player1Area.getChildren().addAll(
@@ -182,7 +191,7 @@ public class JavaFXTemplate extends Application {
         player2PlayButton = createStyledButton("Play", "#4CAF50");
         player2FoldButton = createStyledButton("Fold", "#f44336");
         player2TotalWinningsLabel = new Label("Total Winnings: $0");
-        player2TotalWinningsLabel.setStyle("-fx-text-fill: #00ff00; -fx-font-size: 14px;");
+        player2TotalWinningsLabel.setStyle("-fx-text-fill: #00ff00; -fx-font-size: 14px; -fx-font-weight: bold;");
 
         HBox player2Buttons = new HBox(10, player2PlayButton, player2FoldButton);
         player2Area.getChildren().addAll(
@@ -195,6 +204,7 @@ public class JavaFXTemplate extends Application {
         );
 
         // Style all labels in player areas
+// Style all labels in player areas
         for (VBox playerArea : Arrays.asList(player1Area, player2Area)) {
             playerArea.getChildren().forEach(node -> {
                 if (node instanceof Label) {
@@ -287,6 +297,166 @@ public class JavaFXTemplate extends Application {
             // Start new round
             startNewRound();
         });
+        MenuBar menuBar = new MenuBar();
+        Menu optionsMenu = new Menu("Options");
+
+        MenuItem exitItem = new MenuItem("Exit");
+        MenuItem freshStartItem = new MenuItem("Fresh Start");
+        MenuItem newLookItem = new MenuItem("New Look");
+        newLookItem.setOnAction(e -> toggleTheme());
+
+        optionsMenu.getItems().addAll(exitItem, freshStartItem, newLookItem);
+        menuBar.getMenus().add(optionsMenu);
+
+        // Add event handlers
+        exitItem.setOnAction(e -> showExitScreen());
+        freshStartItem.setOnAction(e -> resetGame());
+        newLookItem.setOnAction(e -> toggleTheme());
+
+        // Add MenuBar to top of BorderPane
+        VBox topContainer = new VBox();
+        topContainer.getChildren().addAll(menuBar, playAgainBox);
+        gameRoot.setTop(topContainer);
+        updateTotalWinningsLabelStyles();
+    }
+
+    private void updateTotalWinningsLabelStyles() {
+        String winningsStyle = "-fx-text-fill: #00ff00; -fx-font-size: 14px; -fx-font-weight: bold;";
+        player1TotalWinningsLabel.setStyle(winningsStyle);
+        player2TotalWinningsLabel.setStyle(winningsStyle);
+    }
+
+    private void showExitScreen() {
+        if (exitScene == null) {
+            createExitScreen();
+        }
+        primaryStage.setScene(exitScene);
+    }
+
+    private void createExitScreen() {
+        VBox exitRoot = new VBox(20);  // 20 pixels spacing between elements
+        exitRoot.setAlignment(Pos.CENTER);
+        exitRoot.setStyle("-fx-background-color: #1a1a1a;");
+        exitRoot.setPadding(new Insets(20));
+
+        // Title
+        Text exitText = new Text("Are you sure you want to exit?");
+        exitText.setFont(new Font("Arial", 28));
+        exitText.setFill(Color.WHITE);
+
+        // Subtitle with current standings (optional)
+        Text standingsText = new Text(String.format(
+                "Current Standings:\nPlayer 1: $%d\nPlayer 2: $%d",
+                playerOne.totalWinnings,
+                playerTwo.totalWinnings
+        ));
+        standingsText.setFont(new Font("Arial", 16));
+        standingsText.setFill(Color.LIGHTGRAY);
+        standingsText.setTextAlignment(TextAlignment.CENTER);
+
+        // Buttons container
+        HBox buttonBox = new HBox(20);  // 20 pixels spacing between buttons
+        buttonBox.setAlignment(Pos.CENTER);
+
+        // Continue button
+        Button continueButton = new Button("Continue Playing");
+        continueButton.setStyle(
+                "-fx-background-color: #4CAF50;"
+                + "-fx-text-fill: white;"
+                + "-fx-font-size: 16px;"
+                + "-fx-padding: 10 20 10 20;"
+                + "-fx-min-width: 150px;"
+                + "-fx-cursor: hand;"
+        );
+        continueButton.setOnAction(e -> returnToGame());
+        continueButton.setOnMouseEntered(e
+                -> continueButton.setStyle(
+                        "-fx-background-color: #45a049;"
+                        + "-fx-text-fill: white;"
+                        + "-fx-font-size: 16px;"
+                        + "-fx-padding: 10 20 10 20;"
+                        + "-fx-min-width: 150px;"
+                        + "-fx-cursor: hand;"
+                )
+        );
+        continueButton.setOnMouseExited(e
+                -> continueButton.setStyle(
+                        "-fx-background-color: #4CAF50;"
+                        + "-fx-text-fill: white;"
+                        + "-fx-font-size: 16px;"
+                        + "-fx-padding: 10 20 10 20;"
+                        + "-fx-min-width: 150px;"
+                        + "-fx-cursor: hand;"
+                )
+        );
+
+        // Quit button
+        Button quitButton = new Button("Quit Game");
+        quitButton.setStyle(
+                "-fx-background-color: #f44336;"
+                + "-fx-text-fill: white;"
+                + "-fx-font-size: 16px;"
+                + "-fx-padding: 10 20 10 20;"
+                + "-fx-min-width: 150px;"
+                + "-fx-cursor: hand;"
+        );
+        quitButton.setOnAction(e -> Platform.exit());
+        quitButton.setOnMouseEntered(e
+                -> quitButton.setStyle(
+                        "-fx-background-color: #d32f2f;"
+                        + "-fx-text-fill: white;"
+                        + "-fx-font-size: 16px;"
+                        + "-fx-padding: 10 20 10 20;"
+                        + "-fx-min-width: 150px;"
+                        + "-fx-cursor: hand;"
+                )
+        );
+        quitButton.setOnMouseExited(e
+                -> quitButton.setStyle(
+                        "-fx-background-color: #f44336;"
+                        + "-fx-text-fill: white;"
+                        + "-fx-font-size: 16px;"
+                        + "-fx-padding: 10 20 10 20;"
+                        + "-fx-min-width: 150px;"
+                        + "-fx-cursor: hand;"
+                )
+        );
+
+        // Add buttons to button container
+        buttonBox.getChildren().addAll(continueButton, quitButton);
+
+        // Add all elements to root container
+        exitRoot.getChildren().addAll(exitText, standingsText, buttonBox);
+
+        // Create scene with black background
+        exitScene = new Scene(exitRoot, 500, 300);
+
+        // Add hover effect cursor for entire scene
+        exitRoot.setOnMouseEntered(e
+                -> exitScene.setCursor(Cursor.DEFAULT)
+        );
+    }
+
+    private void returnToGame() {
+        primaryStage.setScene(gameScene);
+    }
+
+    private void resetGame() {
+        playerOne.totalWinnings = 0;
+        playerTwo.totalWinnings = 0;
+        updateWinningsDisplays();
+        startNewRound();
+    }
+
+    private void toggleTheme() {
+        gameScene.getStylesheets().clear();
+        if ("default".equals(currentTheme)) {
+            currentTheme = "dark";
+            gameScene.getStylesheets().add("dark.css");
+        } else {
+            currentTheme = "default";
+            gameScene.getStylesheets().add("default.css");
+        }
     }
 
     private TextField createStyledTextField(String prompt) {
@@ -492,6 +662,7 @@ public class JavaFXTemplate extends Application {
         }
 
         // Reset UI
+        updateTotalWinningsLabelStyles();
         resetUI();
     }
 
