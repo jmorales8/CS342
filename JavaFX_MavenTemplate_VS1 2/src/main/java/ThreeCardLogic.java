@@ -24,7 +24,8 @@ public class ThreeCardLogic {
         if (isThreeOfAKind(hand)) {
             return THREE_OF_A_KIND;  // This should be checked before Straight
 
-                }if (isStraight(hand)) {
+        }
+        if (isStraight(hand)) {
             return STRAIGHT;
         }
         if (isFlush(hand)) {
@@ -186,13 +187,12 @@ public class ThreeCardLogic {
             result.append("Dealer wins! ");
             result.append(getHandTypeName(evalHand(dealerHand))).append(" beats ");
             result.append(getHandTypeName(evalHand(playerHand))).append("\n");
-            result.append("You lose $").append(anteBet + playBet);
+            result.append("You lose both ante and play bets: $").append(anteBet + playBet);
         } else if (comparison == 2) {
             result.append("You win! ");
             result.append(getHandTypeName(evalHand(playerHand))).append(" beats ");
             result.append(getHandTypeName(evalHand(dealerHand))).append("\n");
-            int winnings = (anteBet + playBet) * 2;
-            result.append("You win $").append(winnings);
+            result.append("You win $").append(anteBet + playBet); // Just report the amount won, not total
         } else {
             result.append("It's a tie!\nBets are returned");
         }
@@ -207,32 +207,32 @@ public class ThreeCardLogic {
 
         int handType = evalHand(hand);
         if (handType == STRAIGHT_FLUSH) {
-            return bet * 40; 
-        }else if (handType == THREE_OF_A_KIND) {
-            return bet * 30; 
-        }else if (handType == STRAIGHT) {
-            return bet * 6; 
-        }else if (handType == FLUSH) {
-            return bet * 3; 
-        }else if (handType == PAIR) {
-            return bet; 
-        }else {
+            return bet * 40;
+        } else if (handType == THREE_OF_A_KIND) {
+            return bet * 30;
+        } else if (handType == STRAIGHT) {
+            return bet * 6;
+        } else if (handType == FLUSH) {
+            return bet * 3;
+        } else if (handType == PAIR) {
+            return bet;
+        } else {
             return 0;
         }
     }
 
     private static String getHandTypeName(int handType) {
         if (handType == STRAIGHT_FLUSH) {
-            return "Straight Flush"; 
-        }else if (handType == THREE_OF_A_KIND) {
-            return "Three of a Kind"; 
-        }else if (handType == STRAIGHT) {
-            return "Straight"; 
-        }else if (handType == FLUSH) {
-            return "Flush"; 
-        }else if (handType == PAIR) {
-            return "Pair"; 
-        }else {
+            return "Straight Flush";
+        } else if (handType == THREE_OF_A_KIND) {
+            return "Three of a Kind";
+        } else if (handType == STRAIGHT) {
+            return "Straight";
+        } else if (handType == FLUSH) {
+            return "Flush";
+        } else if (handType == PAIR) {
+            return "Pair";
+        } else {
             return "High Card";
         }
     }
@@ -256,27 +256,27 @@ public class ThreeCardLogic {
     private static String getCardName(Card card) {
         String value;
         if (card.getValue() == 14) {
-            value = "Ace"; 
-        }else if (card.getValue() == 13) {
-            value = "King"; 
-        }else if (card.getValue() == 12) {
-            value = "Queen"; 
-        }else if (card.getValue() == 11) {
-            value = "Jack"; 
-        }else {
+            value = "Ace";
+        } else if (card.getValue() == 13) {
+            value = "King";
+        } else if (card.getValue() == 12) {
+            value = "Queen";
+        } else if (card.getValue() == 11) {
+            value = "Jack";
+        } else {
             value = String.valueOf(card.getValue());
         }
 
         String suit;
         if (card.getSuit() == 'H') {
-            suit = "♥"; 
-        }else if (card.getSuit() == 'D') {
-            suit = "♦"; 
-        }else if (card.getSuit() == 'C') {
-            suit = "♣"; 
-        }else if (card.getSuit() == 'S') {
-            suit = "♠"; 
-        }else {
+            suit = "♥";
+        } else if (card.getSuit() == 'D') {
+            suit = "♦";
+        } else if (card.getSuit() == 'C') {
+            suit = "♣";
+        } else if (card.getSuit() == 'S') {
+            suit = "♠";
+        } else {
             suit = String.valueOf(card.getSuit());
         }
 

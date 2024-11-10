@@ -1,0 +1,71 @@
+/* Base theme */
+.root {
+  -fx-background-color: #1a1a1a;
+}
+
+/* Button styles */
+.button {
+  -fx-background-color: #4CAF50;
+  -fx-text-fill: white;
+  -fx-font-size: 14px;
+  -fx-background-radius: 5;
+}
+
+.button:hover {
+  -fx-background-color: #45a049;
+}
+
+/* Play button specific style */
+.button.play-button {
+  -fx-background-color: #2E7D32;
+  -fx-text-fill: white;
+}
+
+/* Fold button specific style */
+.button.fold-button {
+  -fx-background-color: #c62828;
+  -fx-text-fill: white;
+}
+
+/* Card styles */
+.card-face {
+  -fx-background-color: white;
+  -fx-border-color: #4CAF50;
+  -fx-border-width: 2;
+  -fx-border-radius: 10;
+  -fx-background-radius: 10;
+}
+
+.card-back {
+  -fx-background-color: #2E7D32;
+  -fx-border-color: #4CAF50;
+  -fx-border-width: 2;
+  -fx-border-radius: 10;
+  -fx-background-radius: 10;
+}
+
+/* Text field styles */
+.text-field {
+  -fx-background-color: #333333;
+  -fx-text-fill: white;
+  -fx-border-color: #4CAF50;
+  -fx-border-radius: 5;
+}
+
+/* Label styles */
+.label {
+  -fx-text-fill: white;
+}
+
+/* Menu styles */
+.menu-bar {
+  -fx-background-color: #333333;
+}
+
+.menu-item {
+  -fx-background-color: #333333;
+}
+
+.menu-item:hover {
+  -fx-background-color: #4CAF50;
+}
