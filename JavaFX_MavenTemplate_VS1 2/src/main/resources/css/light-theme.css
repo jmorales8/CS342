@@ -34,7 +34,7 @@
   -fx-padding: 8 15 8 15 !important; /* More padding inside buttons */
 }
 .game-info-text {
-  -fx-text-fill: #a16017 !important;
+  -fx-text-fill: #99d9a9 !important;
   -fx-font-family: "System" !important;
   -fx-font-size: 14px !important;
   -fx-white-space: pre-wrap !important;
@@ -188,4 +188,30 @@
   -fx-border-color: #cccccc !important;
   -fx-background-size: 20px 20px !important;
   -fx-background-position: 0 0, 0 10px, 10px -10px, -10px 0px !important;
+}
+.light {
+  .rules-content {
+      -fx-background-color: #f5f5f5;
+  }
+
+  .rules-content .label {
+      -fx-text-fill: #000000;
+  }
+
+  .rules-scroll-pane {
+      -fx-background: #f5f5f5;
+  }
+
+  .rules-scroll-pane .viewport {
+      -fx-background-color: #f5f5f5;
+  }
+
+  .rule-section {
+      -fx-background-color: #ffffff;
+      -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);
+  }
+
+  .rule-title {
+      -fx-text-fill: #1976D2;
+  }
 }
