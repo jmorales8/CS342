@@ -22,8 +22,7 @@ public class ThreeCardLogic {
             return STRAIGHT_FLUSH;
         }
         if (isThreeOfAKind(hand)) {
-            return THREE_OF_A_KIND;  // This should be checked before Straight
-
+            return THREE_OF_A_KIND;
         }
         if (isStraight(hand)) {
             return STRAIGHT;
