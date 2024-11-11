@@ -33,7 +33,16 @@
   -fx-background-radius: 3px !important;
   -fx-padding: 8 15 8 15 !important; /* More padding inside buttons */
 }
-
+.game-info-text {
+  -fx-text-fill: #a16017 !important;
+  -fx-font-family: "System" !important;
+  -fx-font-size: 14px !important;
+  -fx-white-space: pre-wrap !important;
+}
+.game-info-label {
+  -fx-text-fill: #00ff00;
+  -fx-font-size: 18px;
+}
 .play-button {
   -fx-background-color: #90ee90 !important; /* Light green */
 }
@@ -91,8 +100,8 @@
 /* Player areas - Light theme */
 .player-area {
   -fx-padding: 20px !important; /* Increased padding inside the playmat */
-  -fx-border-color: #dcdcdc !important;
-  -fx-background-color: #ffffff !important;
+  -fx-border-color: #ec5050 !important;
+  -fx-background-color: #ec5f5f !important;
   -fx-effect: dropshadow(
     three-pass-box,
     rgba(0, 0, 0, 0.1),
@@ -110,7 +119,9 @@
   -fx-padding: 10 0 10 0 !important;
   -fx-alignment: center !important;
 }
-
+.light-theme .game-info-text {
+  -fx-text-fill: #006400 !important;
+}
 .menu-bar {
   -fx-background-color: #d9a6a6 !important;
   -fx-padding: 3px !important; /* Match dark theme padding */
@@ -144,4 +155,37 @@
 .game-button:disabled {
   -fx-background-color: #d3d3d3 !important;
   -fx-opacity: 0.7 !important;
+}
+.card {
+  -fx-font-size: 26px;
+  -fx-background-color: #ffffff !important;
+  -fx-border-color: #cccccc !important;
+  -fx-border-width: 2px !important;
+  -fx-border-radius: 10px !important;
+  -fx-background-radius: 10px !important;
+  -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 5, 0, 0, 0) !important;
+}
+
+.card-text {
+  -fx-fill: #000000 !important;  /* Black text for light mode */
+  -fx-font-family: "System" !important;
+  -fx-font-weight: bold !important;
+  -fx-font-size: 24px !important;  /* Increased from default */
+}
+
+.card-heart, .card-diamond {
+  -fx-fill: #ff0000 !important;  /* Bright red suits */
+  -fx-font-size: 36px !important;  /* Bigger suit symbols */
+}
+
+.card-spade, .card-club {
+  -fx-fill: #000000 !important;  /* Black suits */
+  -fx-font-size: 36px !important;  /* Bigger suit symbols */
+}
+
+.card-back {
+  -fx-background-color: #f0f0f0 !important;
+  -fx-border-color: #cccccc !important;
+  -fx-background-size: 20px 20px !important;
+  -fx-background-position: 0 0, 0 10px, 10px -10px, -10px 0px !important;
 }

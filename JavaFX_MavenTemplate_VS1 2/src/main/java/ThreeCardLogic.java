@@ -170,33 +170,35 @@ public class ThreeCardLogic {
 
     public static String determineWinner(ArrayList<Card> dealerHand, ArrayList<Card> playerHand, int anteBet, int playBet) {
         StringBuilder result = new StringBuilder();
-
+    
         // Add hand descriptions
         result.append("Your hand: ").append(describeHand(playerHand)).append("\n");
         result.append("Dealer's hand: ").append(describeHand(dealerHand)).append("\n");
-
+    
         // First check if dealer qualifies (Queen high or better)
         if (!dealerQualifies(dealerHand)) {
             result.append("Dealer does not qualify - Queen high or better required.\n");
             result.append("Play bet is returned and Ante pushes to next hand.\n");
             return result.toString();
         }
-
+    
         int comparison = compareHands(dealerHand, playerHand);
         if (comparison == 1) {
             result.append("Dealer wins! ");
             result.append(getHandTypeName(evalHand(dealerHand))).append(" beats ");
             result.append(getHandTypeName(evalHand(playerHand))).append("\n");
-            result.append("You lose both ante and play bets: $").append(anteBet + playBet);
+            result.append("You lose $").append(anteBet + playBet);
         } else if (comparison == 2) {
             result.append("You win! ");
             result.append(getHandTypeName(evalHand(playerHand))).append(" beats ");
             result.append(getHandTypeName(evalHand(dealerHand))).append("\n");
-            result.append("You win $").append(anteBet + playBet); // Just report the amount won, not total
+            int winnings = (anteBet + playBet) * 2;
+            result.append("You win $").append(winnings);
         } else {
-            result.append("It's a tie!\nBets are returned");
+            result.append("It's a tie! Both have ").append(getHandTypeName(evalHand(playerHand))).append("\n");
+            result.append("All bets returned");
         }
-
+    
         return result.toString();
     }
 

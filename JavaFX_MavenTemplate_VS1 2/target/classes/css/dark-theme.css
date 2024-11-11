@@ -40,6 +40,19 @@
 .menu-item:hover {
   -fx-background-color: #4CAF50;
 }
+.results-container {
+  -fx-padding: 10px !important;
+  -fx-alignment: center !important;
+  -fx-spacing: 40px !important;
+}
+
+.game-info-text {
+  -fx-text-fill: #00ff00 !important;
+  -fx-font-family: "System" !important;
+  -fx-font-size: 14px !important;
+  -fx-white-space: pre-wrap !important;
+}
+
 
 /* Button styles */
 .game-button {
@@ -161,4 +174,36 @@
 
 .fold-button:disabled {
   -fx-background-color: #c17b74;
+}
+.card {
+  -fx-background-color: #2d2d2d !important;
+  -fx-border-color: #4a4a4a !important;
+  -fx-border-width: 2px !important;
+  -fx-border-radius: 10px !important;
+  -fx-background-radius: 10px !important;
+  -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 5, 0, 0, 0) !important;
+}
+
+.card-text {
+  -fx-fill: #00ff00 !important;  /* Green text for dark mode */
+  -fx-font-family: "System" !important;
+  -fx-font-weight: bold !important;
+  -fx-font-size: 24px !important;  /* Increased from default */
+}
+
+.card-heart, .card-diamond {
+  -fx-fill: #ff4444 !important;  /* Red suits */
+  -fx-font-size: 36px !important;  /* Bigger suit symbols */
+}
+
+.card-spade, .card-club {
+  -fx-fill: #ffffff !important;  /* White suits */
+  -fx-font-size: 36px !important;  /* Bigger suit symbols */
+}
+
+.card-back {
+  -fx-background-color: #1a1a1a !important;
+  -fx-border-color: #4a4a4a !important;
+  -fx-background-size: 20px 20px !important;
+  -fx-background-position: 0 0, 0 10px, 10px -10px, -10px 0px !important;
 }

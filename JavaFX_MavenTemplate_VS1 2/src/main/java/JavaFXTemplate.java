@@ -18,6 +18,8 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -78,6 +80,7 @@ public class JavaFXTemplate extends Application {
     private Label player1PushedAntesLabel;
     private Label player2PushedAntesLabel;
     private MenuItem newLookItem;
+    private VBox dealerArea;
 
     @Override
     public void start(Stage primaryStage) {
@@ -104,21 +107,6 @@ public class JavaFXTemplate extends Application {
 
         primaryStage.setScene(startScene);
         primaryStage.show();
-    }
-
-    private void loadStyles(Scene scene) {
-        String[] stylesheets = {
-            "/css/buttons.css",
-            "/css/inputs.css",
-            "/css/labels.css",
-            "/css/containers.css",
-            "/css/menu.css"
-        };
-
-        for (String stylesheet : stylesheets) {
-            String css = getClass().getResource(stylesheet).toExternalForm();
-            scene.getStylesheets().add(css);
-        }
     }
 
     private void toggleTheme() {
@@ -174,7 +162,72 @@ public class JavaFXTemplate extends Application {
         startRoot.getChildren().addAll(titleText, startButton, exitButton);
         startScene = new Scene(startRoot, 1200, 800);
     }
+    // private StackPane createCard(Card card, boolean isFaceDown) {
+    //     StackPane cardPane = new StackPane();
+    //     cardPane.setPrefSize(120, 160);
+    //     cardPane.getStyleClass().add("card");
 
+    //     // Create card face elements
+    //     Region cardFace = new Region();
+    //     cardFace.getStyleClass().add("card");
+    //     cardFace.setPrefSize(120, 160);
+
+    //     // Create card value text
+    //     Text cardText = new Text(getCardValueString(card));
+    //     cardText.getStyleClass().addAll("card-text");
+
+    //     // Create suit symbol
+    //     Text suitText = new Text(getSuitSymbol(card));
+    //     suitText.getStyleClass().addAll("card-text", getSuitStyleClass(card));
+
+    //     // Layout for face-up card
+    //     VBox faceLayout = new VBox(10);
+    //     faceLayout.setAlignment(Pos.CENTER);
+    //     faceLayout.setPadding(new Insets(10, 0, 10, 0));
+    //     faceLayout.getChildren().addAll(cardText, suitText);
+
+    //     // Create card back
+    //     Region cardBack = new Region();
+    //     cardBack.getStyleClass().addAll("card", "card-back");
+    //     cardBack.setPrefSize(120, 160);
+    //     cardBack.setVisible(isFaceDown);
+
+    //     // Add all elements
+    //     cardPane.getChildren().addAll(cardFace, faceLayout, cardBack);
+
+    //     return cardPane;
+    // }
+
+    private String getCardValueString(Card card) {
+        int value = card.getValue();
+        switch (value) {
+            case 14: return "A";
+            case 13: return "K";
+            case 12: return "Q";
+            case 11: return "J";
+            default: return String.valueOf(value);
+        }
+    }
+
+    private String getSuitSymbol(Card card) {
+        switch (card.getSuit()) {
+            case 'H': return "♥";
+            case 'D': return "♦";
+            case 'C': return "♣";
+            case 'S': return "♠";
+            default: return "";
+        }
+    }
+
+    private String getSuitStyleClass(Card card) {
+        switch (card.getSuit()) {
+            case 'H': return "card-heart";
+            case 'D': return "card-diamond";
+            case 'C': return "card-club";
+            case 'S': return "card-spade";
+            default: return "";
+        }
+    }
     private void createGameScreen() {
         BorderPane gameRoot = new BorderPane();
         gameRoot.getStyleClass().add("root");
@@ -190,7 +243,7 @@ public class JavaFXTemplate extends Application {
         mainContent.getStyleClass().add("root");
 
         // Dealer area at top with title
-        VBox dealerArea = new VBox(10);
+        dealerArea = new VBox(10);  // Create as class field now
         dealerArea.setAlignment(Pos.CENTER);
         Label dealerLabel = new Label("Dealer's Cards");
         dealerLabel.getStyleClass().add("dealer-label");
@@ -336,7 +389,7 @@ public class JavaFXTemplate extends Application {
         MenuBar menuBar = new MenuBar();
         menuBar.getStyleClass().add("menu-bar");
         menuBar.setUseSystemMenuBar(false);  // Add this line to ensure consistent styling
-        
+
         Menu optionsMenu = new Menu("Options");
         optionsMenu.getStyleClass().add("menu");
 
@@ -490,14 +543,52 @@ public class JavaFXTemplate extends Application {
         player2PushedAntesLabel.setText(String.format("Pushed Antes: $%d", player2PushedAntes));
     }
 
-// Update resetGame() to also reset pushed antes:
     private void resetGame() {
+        // Reset player values
         playerOne.totalWinnings = 0;
         playerTwo.totalWinnings = 0;
         player1PushedAntes = 0;
         player2PushedAntes = 0;
+
+        // Reset all flags
+        player1InitialBetMade = false;
+        player2InitialBetMade = false;
+        player1PlayDecisionMade = false;
+        player2PlayDecisionMade = false;
+
+        // Clear all text fields
+        player1AnteField.clear();
+        player1PairPlusField.clear();
+        player2AnteField.clear();
+        player2PairPlusField.clear();
+
+        // Reset buttons
+        player1PlayButton.setText("Play");
+        player2PlayButton.setText("Play");
+        player1FoldButton.setText("Fold");
+        player2FoldButton.setText("Fold");
+
+        // Enable all controls
+        setPlayer1ControlsEnabled(true);
+        setPlayer2ControlsEnabled(true);
+
+        // Clear game info
+        gameInfoLabel.setText("Players: Place your bets");
+
+        // Clear previous results if any
+        dealerArea.getChildren().removeIf(node
+                -> node instanceof HBox
+                && ((HBox) node).getStyleClass().contains("results-container")
+        );
+
+        // Reset displays
         updateWinningsDisplays();
         updatePushedAntesDisplay();
+
+        // Hide play again box
+        playAgainBox.setVisible(false);
+
+        // Start new round
         startNewRound();
     }
 
@@ -776,98 +867,112 @@ public class JavaFXTemplate extends Application {
 
     private void evaluateRound() {
         currentState = GameState.ROUND_COMPLETE;
-        StringBuilder finalResult = new StringBuilder("Results:\n\n");
 
-        // Calculate Player 1 results
+        // Calculate results
         String player1Result = ThreeCardLogic.determineWinner(dealerHand, player1Hand,
                 playerOne.anteBet, playerOne.playBet);
         int player1PairPlus = ThreeCardLogic.evalPPWinnings(player1Hand, playerOne.pairPlusBet);
 
-        // Calculate Player 2 results
         String player2Result = ThreeCardLogic.determineWinner(dealerHand, player2Hand,
                 playerTwo.anteBet, playerTwo.playBet);
         int player2PairPlus = ThreeCardLogic.evalPPWinnings(player2Hand, playerTwo.pairPlusBet);
 
-        // Handle Player 1 results
-        finalResult.append("Player 1:\n");
-        finalResult.append(player1Result).append("\n");
+        // Create containers for side-by-side display
+        HBox resultsContainer = new HBox(40);  // 40px spacing between player results
+        resultsContainer.setAlignment(Pos.CENTER);
+        resultsContainer.getStyleClass().add("results-container");
 
-        if (player1Result.contains("You win")) {
-            // Player wins - they get their ante and play bet back plus matching amounts
+        VBox player1Results = new VBox(5);  // 5px spacing between lines
+        VBox player2Results = new VBox(5);
+
+        // Build Player 1 results
+        StringBuilder p1Result = new StringBuilder();
+        p1Result.append("Player 1:\n");
+        p1Result.append(player1Result).append("\n");
+        StringBuilder p2Result = new StringBuilder();
+        p2Result.append("Player 2:\n");
+        p2Result.append(player2Result).append("\n");
+        if (player1Result.contains("It's a tie")) {
+            p1Result.append("Tie - bets returned\n");
+        } else if (player1Result.contains("You win")) {
             int winnings = (playerOne.anteBet + playerOne.playBet);
             playerOne.totalWinnings += winnings;
-            // If there were pushed antes, they win those too
             if (player1PushedAntes > 0) {
                 playerOne.totalWinnings += player1PushedAntes;
-                finalResult.append("Won pushed antes: $").append(player1PushedAntes).append("\n");
-                player1PushedAntes = 0;  // Clear pushed antes after winning
+                p1Result.append("Won pushed antes: $").append(player1PushedAntes).append("\n");
+                player1PushedAntes = 0;
             }
-            finalResult.append("Main Game Winnings: $").append(winnings).append("\n");
+            p1Result.append("Main Game Winnings: $").append(winnings).append("\n");
         } else if (player1Result.contains("Dealer wins")) {
-            // Player loses current bets and pushed antes
-            finalResult.append("Loss: $").append(playerOne.anteBet + playerOne.playBet).append("\n");
+            int loss = playerOne.anteBet;  // Only subtract the ante amount once
+            playerOne.totalWinnings -= loss;
+            p1Result.append("Loss: $").append(loss).append("\n");
             if (player1PushedAntes > 0) {
-                finalResult.append("Lost pushed antes: $").append(player1PushedAntes).append("\n");
+                p1Result.append("Lost pushed antes: $").append(player1PushedAntes).append("\n");
                 player1PushedAntes = 0;
             }
         } else if (player1Result.contains("Dealer does not qualify")) {
-            // Return play bet, push ante
-            finalResult.append("Play bet returned: $").append(playerOne.playBet).append("\n");
+            p1Result.append("Play bet returned: $").append(playerOne.playBet).append("\n");
             player1PushedAntes += playerOne.anteBet;
-            finalResult.append("Ante pushes to next hand (Total pushed: $")
+            p1Result.append("Ante pushes to next hand (Total pushed: $")
                     .append(player1PushedAntes).append(")\n");
             playerOne.playBet = 0;
         }
-
-        // Handle Pair Plus bet for Player 1
-        if (player1PairPlus > 0) {
-            playerOne.totalWinnings += player1PairPlus;
-            finalResult.append("Pair Plus Winnings: $").append(player1PairPlus).append("\n");
-        } else if (playerOne.pairPlusBet > 0) {
-            finalResult.append("Pair Plus Loss: $").append(playerOne.pairPlusBet).append("\n");
-        }
-
-        // Handle Player 2 results
-        finalResult.append("\nPlayer 2:\n");
-        finalResult.append(player2Result).append("\n");
-
-        if (player2Result.contains("You win")) {
+        
+        // For Player 2:
+        if (player2Result.contains("It's a tie")) {
+            p2Result.append("Tie - bets returned\n");
+        } else if (player2Result.contains("You win")) {
             int winnings = (playerTwo.anteBet + playerTwo.playBet);
             playerTwo.totalWinnings += winnings;
             if (player2PushedAntes > 0) {
                 playerTwo.totalWinnings += player2PushedAntes;
-                finalResult.append("Won pushed antes: $").append(player2PushedAntes).append("\n");
+                p2Result.append("Won pushed antes: $").append(player2PushedAntes).append("\n");
                 player2PushedAntes = 0;
             }
-            finalResult.append("Main Game Winnings: $").append(winnings).append("\n");
+            p2Result.append("Main Game Winnings: $").append(winnings).append("\n");
         } else if (player2Result.contains("Dealer wins")) {
-            finalResult.append("Loss: $").append(playerTwo.anteBet + playerTwo.playBet).append("\n");
+            int loss = playerTwo.anteBet;  // Only subtract the ante amount once
+            playerTwo.totalWinnings -= loss;
+            p2Result.append("Loss: $").append(loss).append("\n");
             if (player2PushedAntes > 0) {
-                finalResult.append("Lost pushed antes: $").append(player2PushedAntes).append("\n");
+                p2Result.append("Lost pushed antes: $").append(player2PushedAntes).append("\n");
                 player2PushedAntes = 0;
             }
         } else if (player2Result.contains("Dealer does not qualify")) {
-            finalResult.append("Play bet returned: $").append(playerTwo.playBet).append("\n");
+            p2Result.append("Play bet returned: $").append(playerTwo.playBet).append("\n");
             player2PushedAntes += playerTwo.anteBet;
-            finalResult.append("Ante pushes to next hand (Total pushed: $")
+            p2Result.append("Ante pushes to next hand (Total pushed: $")
                     .append(player2PushedAntes).append(")\n");
             playerTwo.playBet = 0;
         }
 
-        // Handle Pair Plus bet for Player 2
-        if (player2PairPlus > 0) {
-            playerTwo.totalWinnings += player2PairPlus;
-            finalResult.append("Pair Plus Winnings: $").append(player2PairPlus).append("\n");
-        } else if (playerTwo.pairPlusBet > 0) {
-            finalResult.append("Pair Plus Loss: $").append(playerTwo.pairPlusBet).append("\n");
-        }
+        // Create and style labels for results
+        Label player1ResultLabel = new Label(p1Result.toString());
+        Label player2ResultLabel = new Label(p2Result.toString());
 
-        // Update the pushed antes labels
-        updatePushedAntesDisplay();
+        player1ResultLabel.getStyleClass().add("game-info-text");
+        player2ResultLabel.getStyleClass().add("game-info-text");
+
+        // Add results to their containers
+        player1Results.getChildren().add(player1ResultLabel);
+        player2Results.getChildren().add(player2ResultLabel);
+
+        resultsContainer.getChildren().addAll(player1Results, player2Results);
 
         // Update displays
+        gameInfoLabel.setText("Results:");
+
+        // Clear previous results if any
+        dealerArea.getChildren().removeIf(node -> node instanceof HBox
+                && ((HBox) node).getStyleClass().contains("results-container"));
+
+        // Add new results
+        dealerArea.getChildren().add(resultsContainer);
+
+        // Update other UI elements
+        updatePushedAntesDisplay();
         updateWinningsDisplays();
-        gameInfoLabel.setText(finalResult.toString());
         playAgainBox.setVisible(true);
         dealButton.setDisable(false);
     }
