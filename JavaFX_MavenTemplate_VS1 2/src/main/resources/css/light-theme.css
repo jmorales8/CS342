@@ -15,31 +15,48 @@
   -fx-text-fill: #1a1a1a !important;
   -fx-font-weight: bold !important;
   -fx-background-radius: 3px !important;
+  -fx-spacing: 15 !important; /* Space between Play and Fold buttons */
+  -fx-alignment: center !important;
+  -fx-padding: 10 0 10 0 !important; /* Top and bottom padding */
+}
+
+.button-container {
+  -fx-spacing: 10 !important;
+  -fx-padding: 0 !important;
+}
+
+.play-button,
+.fold-button {
+  -fx-min-width: 100px !important; /* Increased from 60px */
+  -fx-min-height: 35px !important; /* Taller buttons */
+  -fx-font-size: 14px !important;
+  -fx-background-radius: 3px !important;
+  -fx-padding: 8 15 8 15 !important; /* More padding inside buttons */
 }
 
 .play-button {
-  -fx-background-color: #90EE90 !important;  /* Light green */
+  -fx-background-color: #90ee90 !important; /* Light green */
 }
 
 .play-button:hover {
-  -fx-background-color: #98FB98 !important;
+  -fx-background-color: #98fb98 !important;
 }
 
 .fold-button {
-  -fx-background-color: #FFB6C1 !important;  /* Light red */
+  -fx-background-color: #ffb6c1 !important; /* Light red */
 }
 
 .fold-button:hover {
-  -fx-background-color: #FFC0CB !important;
+  -fx-background-color: #ffc0cb !important;
 }
 
 .primary-button {
-  -fx-background-color: #90EE90 !important;
+  -fx-background-color: #90ee90 !important;
   -fx-text-fill: #1a1a1a !important;
 }
 
 .danger-button {
-  -fx-background-color: #FFB6C1 !important;
+  -fx-background-color: #ffb6c1 !important;
   -fx-text-fill: #1a1a1a !important;
 }
 
@@ -53,7 +70,7 @@
 }
 
 .game-info-label {
-  -fx-text-fill: #006400 !important;  /* Dark green */
+  -fx-text-fill: #006400 !important; /* Dark green */
 }
 
 .winnings-label {
@@ -61,42 +78,70 @@
 }
 
 .pushed-antes-label {
-  -fx-text-fill: #8B4513 !important;  /* Dark brown */
+  -fx-text-fill: #8b4513 !important; /* Dark brown */
 }
 
 /* TextField - Light theme */
 .styled-textfield {
   -fx-background-color: white !important;
   -fx-text-fill: #1a1a1a !important;
-  -fx-border-color: #90EE90 !important;
+  -fx-border-color: #90ee90 !important;
 }
 
 /* Player areas - Light theme */
 .player-area {
-  -fx-border-color: #DCDCDC !important;
-  -fx-background-color: #FFFFFF !important;
-  -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 0) !important;
+  -fx-padding: 20px !important; /* Increased padding inside the playmat */
+  -fx-border-color: #dcdcdc !important;
+  -fx-background-color: #ffffff !important;
+  -fx-effect: dropshadow(
+    three-pass-box,
+    rgba(0, 0, 0, 0.1),
+    5,
+    0,
+    0,
+    0
+  ) !important;
+  -fx-spacing: 15 !important; /* Increased vertical spacing between elements */
+  -fx-margin: 20px !important; /* Added margin around the playmat */
 }
 
-/* Menu - Light theme */
+.card-container {
+  -fx-spacing: 15 !important;
+  -fx-padding: 10 0 10 0 !important;
+  -fx-alignment: center !important;
+}
+
 .menu-bar {
-  -fx-background-color: #E8E8E8 !important;
+  -fx-background-color: #d9a6a6 !important;
+  -fx-padding: 3px !important; /* Match dark theme padding */
+}
+
+.menu {
+  -fx-padding: 3px !important; /* Minimal padding */
+}
+
+.menu > .label {
+  -fx-text-fill: #1a1a1a !important;
+  -fx-padding: 0 4 0 4 !important; /* Adjusted padding */
 }
 
 .menu-item {
-  -fx-background-color: #F5F5F5 !important;
-}
-
-.menu-item:hover {
-  -fx-background-color: #90EE90 !important;
+  -fx-background-color: #f5f5f5 !important;
+  -fx-padding: 2 10 2 10 !important; /* Minimal padding */
+  -fx-min-height: 24px !important; /* Set fixed height */
 }
 
 .menu-item .label {
   -fx-text-fill: #1a1a1a !important;
+  -fx-padding: 0 4 0 4 !important; /* Consistent padding */
+}
+
+.menu-item:hover {
+  -fx-background-color: #90ee90 !important;
 }
 
 /* Disabled states - Light theme */
 .game-button:disabled {
-  -fx-background-color: #D3D3D3 !important;
+  -fx-background-color: #d3d3d3 !important;
   -fx-opacity: 0.7 !important;
 }

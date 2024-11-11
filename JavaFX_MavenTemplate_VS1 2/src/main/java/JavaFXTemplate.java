@@ -78,32 +78,34 @@ public class JavaFXTemplate extends Application {
     private Label player1PushedAntesLabel;
     private Label player2PushedAntesLabel;
     private MenuItem newLookItem;
+
     @Override
     public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
         primaryStage.setTitle("Three Card Poker");
-    
+
         // Initialize game objects
         playerOne = new Player();
         playerTwo = new Player();
         theDealer = new Dealer();
-    
+
         // Load CSS first
         String css = getClass().getResource("/css/dark-theme.css").toExternalForm();
-    
+
         createStartScreen();
         createGameScreen();
-    
+
         // Apply CSS to both scenes
         startScene.getStylesheets().add(css);
         gameScene.getStylesheets().add(css);
-        
+
         // Set initial theme
         currentTheme = "default";
-    
+
         primaryStage.setScene(startScene);
         primaryStage.show();
     }
+
     private void loadStyles(Scene scene) {
         String[] stylesheets = {
             "/css/buttons.css",
@@ -118,11 +120,12 @@ public class JavaFXTemplate extends Application {
             scene.getStylesheets().add(css);
         }
     }
+
     private void toggleTheme() {
         // Clear existing stylesheets
         gameScene.getStylesheets().clear();
         startScene.getStylesheets().clear();
-    
+
         if ("default".equals(currentTheme)) {
             // Switch to light theme
             currentTheme = "light";
@@ -147,6 +150,7 @@ public class JavaFXTemplate extends Application {
             e.printStackTrace();
         }
     }
+
     private void createStartScreen() {
         VBox startRoot = new VBox(20);
         startRoot.setAlignment(Pos.CENTER);
@@ -330,29 +334,31 @@ public class JavaFXTemplate extends Application {
 
         // Menu setup
         MenuBar menuBar = new MenuBar();
-    menuBar.getStyleClass().add("menu-bar");
-    
-    Menu optionsMenu = new Menu("Options");
-    optionsMenu.getStyleClass().add("menu");
+        menuBar.getStyleClass().add("menu-bar");
+        menuBar.setUseSystemMenuBar(false);  // Add this line to ensure consistent styling
+        
+        Menu optionsMenu = new Menu("Options");
+        optionsMenu.getStyleClass().add("menu");
 
-    MenuItem exitItem = new MenuItem("Exit");
-    MenuItem freshStartItem = new MenuItem("Fresh Start");
-    newLookItem = new MenuItem("Switch to Light Theme");  // Initialize the class field here
+        MenuItem exitItem = new MenuItem("Exit");
+        MenuItem freshStartItem = new MenuItem("Fresh Start");
+        newLookItem = new MenuItem("Switch to Light Theme");  // Initialize the class field here
 
-    // Add styles to menu items
-    Arrays.asList(exitItem, freshStartItem, newLookItem)
-        .forEach(item -> item.getStyleClass().add("menu-item"));
+        // Add styles to menu items
+        Arrays.asList(exitItem, freshStartItem, newLookItem)
+                .forEach(item -> item.getStyleClass().add("menu-item"));
 
-    // Add event handlers
-    exitItem.setOnAction(e -> showExitScreen());
-    freshStartItem.setOnAction(e -> resetGame());
-    newLookItem.setOnAction(e -> toggleTheme());
+        // Add event handlers
+        exitItem.setOnAction(e -> showExitScreen());
+        freshStartItem.setOnAction(e -> resetGame());
+        newLookItem.setOnAction(e -> toggleTheme());
 
-    optionsMenu.getItems().addAll(exitItem, freshStartItem, newLookItem);
-    menuBar.getMenus().add(optionsMenu);
+        optionsMenu.getItems().addAll(exitItem, freshStartItem, newLookItem);
+        menuBar.getMenus().add(optionsMenu);
 
         // Add MenuBar to top of BorderPane
         VBox topContainer = new VBox();
+        topContainer.setSpacing(0);  // Set spacing to 0
         topContainer.getChildren().addAll(menuBar, playAgainBox);
         gameRoot.setTop(topContainer);
     }
@@ -534,13 +540,13 @@ public class JavaFXTemplate extends Application {
             try {
                 int anteBet = Integer.parseInt(player1AnteField.getText());
                 int pairPlusBet = 0;
-    
+
                 // Validate ante bet
                 if (anteBet < 5 || anteBet > 25) {
                     gameInfoLabel.setText("Ante bet must be between $5 and $25");
                     return;
                 }
-    
+
                 // Validate pair plus bet if entered
                 if (!player1PairPlusField.getText().isEmpty()) {
                     pairPlusBet = Integer.parseInt(player1PairPlusField.getText());
@@ -549,22 +555,22 @@ public class JavaFXTemplate extends Application {
                         return;
                     }
                 }
-    
+
                 playerOne.anteBet = anteBet;
                 playerOne.pairPlusBet = pairPlusBet;
                 player1InitialBetMade = true;
-    
+
                 // Update UI for play decision
                 player1AnteField.setDisable(true);
                 player1PairPlusField.setDisable(true);
                 player1PlayButton.setText("Make Play Bet (" + anteBet + ")");
                 player1FoldButton.setText("Fold");
-    
+
                 // Show player's cards
                 revealPlayer1Cards();
-    
+
                 checkInitialBets();
-    
+
             } catch (NumberFormatException e) {
                 gameInfoLabel.setText("Please enter valid bets");
                 return;
@@ -578,33 +584,33 @@ public class JavaFXTemplate extends Application {
                 playerOne.playBet = 0;
                 playerOne.pairPlusBet = 0;
             }
-    
+
             player1PlayDecisionMade = true;
             // Instead of disabling, we'll keep the buttons enabled but styled as disabled
             player1PlayButton.setDisable(true);  // This will trigger the CSS disabled state
             player1FoldButton.setDisable(true);   // This will trigger the CSS disabled state
-            
+
             // Optional: Add a visual indicator that the decision is locked in
             player1PlayButton.setText(isPlay ? "Play Bet Made" : "Folded");
             player1FoldButton.setText(isPlay ? "Play Bet Made" : "Folded");
-    
+
             checkPlayDecisions();
         }
     }
-    
+
     private void handlePlayer2Action(boolean isPlay) {
         if (!player2InitialBetMade) {
             // Handle initial ante and pair plus bets
             try {
                 int anteBet = Integer.parseInt(player2AnteField.getText());
                 int pairPlusBet = 0;
-    
+
                 // Validate ante bet
                 if (anteBet < 5 || anteBet > 25) {
                     gameInfoLabel.setText("Ante bet must be between $5 and $25");
                     return;
                 }
-    
+
                 // Validate pair plus bet if entered
                 if (!player2PairPlusField.getText().isEmpty()) {
                     pairPlusBet = Integer.parseInt(player2PairPlusField.getText());
@@ -613,22 +619,22 @@ public class JavaFXTemplate extends Application {
                         return;
                     }
                 }
-    
+
                 playerTwo.anteBet = anteBet;
                 playerTwo.pairPlusBet = pairPlusBet;
                 player2InitialBetMade = true;
-    
+
                 // Update UI for play decision
                 player2AnteField.setDisable(true);
                 player2PairPlusField.setDisable(true);
                 player2PlayButton.setText("Make Play Bet (" + anteBet + ")");
                 player2FoldButton.setText("Fold");
-    
+
                 // Show player's cards
                 revealPlayer2Cards();
-    
+
                 checkInitialBets();
-    
+
             } catch (NumberFormatException e) {
                 gameInfoLabel.setText("Please enter valid bets");
                 return;
@@ -642,16 +648,16 @@ public class JavaFXTemplate extends Application {
                 playerTwo.playBet = 0;
                 playerTwo.pairPlusBet = 0;
             }
-    
+
             player2PlayDecisionMade = true;
             // Instead of disabling, we'll keep the buttons enabled but styled as disabled
             player2PlayButton.setDisable(true);  // This will trigger the CSS disabled state
             player2FoldButton.setDisable(true);   // This will trigger the CSS disabled state
-            
+
             // Optional: Add a visual indicator that the decision is locked in
             player2PlayButton.setText(isPlay ? "Play Bet Made" : "Folded");
             player2FoldButton.setText(isPlay ? "Play Bet Made" : "Folded");
-    
+
             checkPlayDecisions();
         }
     }
@@ -893,11 +899,11 @@ public class JavaFXTemplate extends Application {
         player2PlayButton.setDisable(!enabled);
         player2FoldButton.setDisable(!enabled);
     }
+
     private void showGameScreen() {
         primaryStage.setScene(gameScene);
         primaryStage.setTitle("Three Card Poker - Game");
         startNewRound();
-        
         // Ensure menu stays visible by re-applying styles if needed
         if (gameScene.getStylesheets().isEmpty()) {
             String css = getClass().getResource("/css/dark-theme.css").toExternalForm();
