@@ -97,4 +97,9 @@ public class ServerLogic {
             gui.updateLog("Client disconnected");
         }
     }
+    public void logMessage(String message) {
+        if (gui != null) {
+            gui.updateLog(message);
+        }
+    }
 }

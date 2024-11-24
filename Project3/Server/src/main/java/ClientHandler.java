@@ -21,10 +21,20 @@ public class ClientHandler implements Runnable {
             in = new ObjectInputStream(clientSocket.getInputStream());
 
             while (isRunning) {
-                // We'll add game logic here later
-                Thread.sleep(100); // Temporary, to prevent busy waiting
+                try {
+                    Object message = in.readObject();
+                    if (message != null) {
+                        // Log received message
+                        server.logMessage("Received from client: " + message.toString());
+                    }
+                } catch (EOFException e) {
+                    // Client disconnected
+                    break;
+                }
             }
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException | ClassNotFoundException e) {
+            server.logMessage("Error in client handler: " + e.getMessage());
+        } finally {
             closeConnection();
         }
     }
@@ -36,8 +46,17 @@ public class ClientHandler implements Runnable {
             if (in != null) in.close();
             if (clientSocket != null) clientSocket.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            server.logMessage("Error closing client connection: " + e.getMessage());
         }
         server.removeClient(this);
+    }
+
+    public void sendMessage(String message) {
+        try {
+            out.writeObject(message);
+            out.flush();
+        } catch (IOException e) {
+            server.logMessage("Error sending message to client: " + e.getMessage());
+        }
     }
 }
