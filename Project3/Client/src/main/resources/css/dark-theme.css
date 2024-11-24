@@ -1,0 +1,332 @@
+/* Base/Root styles */
+.root {
+  -fx-background-color: #1a1a1a;
+}
+
+/* ScrollPane styling */
+.scroll-pane {
+  -fx-background: #1a1a1a;
+  -fx-background-color: #1a1a1a;
+  -fx-control-inner-background: #1a1a1a;
+}
+
+.scroll-pane > .viewport {
+  -fx-background-color: #1a1a1a;
+}
+
+/* Menu styling */
+.menu-bar {
+  -fx-background-color: #333333;
+  -fx-padding: 3px;
+}
+
+.menu {
+  -fx-padding: 3px 6px;
+}
+
+.menu > .label {
+  -fx-text-fill: white;
+}
+
+.menu-item {
+  -fx-background-color: #333333;
+  -fx-padding: 5px 10px;
+}
+
+.menu-item .label {
+  -fx-text-fill: white;
+}
+
+.menu-item:hover {
+  -fx-background-color: #4CAF50;
+}
+.results-container {
+  -fx-padding: 10px !important;
+  -fx-alignment: center !important;
+  -fx-spacing: 40px !important;
+}
+
+.game-info-text {
+  -fx-text-fill: #00ff00 !important;
+  -fx-font-family: "System" !important;
+  -fx-font-size: 14px !important;
+  -fx-white-space: pre-wrap !important;
+}
+
+
+/* Button styles */
+.game-button {
+  -fx-text-fill: white;
+  -fx-font-size: 14px;
+  -fx-min-width: 60px;
+  -fx-background-radius: 3px;
+  -fx-font-weight: bold;
+  -fx-alignment: center;
+  -fx-text-alignment: center;
+}
+
+.play-button {
+  -fx-background-color: #4CAF50;
+}
+
+.play-button:hover {
+  -fx-background-color: #45a049;
+}
+
+.fold-button {
+  -fx-background-color: #f44336;
+}
+
+.fold-button:hover {
+  -fx-background-color: #d32f2f;
+}
+
+.primary-button {
+  -fx-background-color: #4CAF50;
+  -fx-text-fill: white;
+  -fx-font-size: 14px;
+  -fx-padding: 10 20 10 20;
+  -fx-min-width: 200px;
+}
+
+.primary-button:hover {
+  -fx-background-color: #45a049;
+}
+
+.danger-button {
+  -fx-background-color: #f44336;
+  -fx-text-fill: white;
+  -fx-font-size: 14px;
+  -fx-padding: 10 20 10 20;
+  -fx-min-width: 200px;
+}
+
+.danger-button:hover {
+  -fx-background-color: #d32f2f;
+}
+
+/* Label styles */
+.title-text {
+  -fx-font-family: "Arial";
+  -fx-font-size: 36px;
+  -fx-fill: white;
+}
+
+.game-info-label {
+  -fx-text-fill: #00ff00;
+  -fx-font-size: 18px;
+}
+
+.dealer-label {
+  -fx-text-fill: white;
+  -fx-font-size: 16px;
+}
+
+.player-label {
+  -fx-text-fill: white;
+}
+
+.winnings-label {
+  -fx-text-fill: #00ff00;
+  -fx-font-size: 14px;
+  -fx-font-weight: bold;
+}
+
+.pushed-antes-label {
+  -fx-text-fill: yellow;
+  -fx-font-size: 14px;
+}
+
+/* Player area styling */
+.player-area {
+  -fx-padding: 10px;
+  -fx-border-color: #333333;
+}
+
+/* Container styles */
+.card-container {
+  -fx-spacing: 10;
+  -fx-alignment: center;
+}
+
+.button-container {
+  -fx-spacing: 10;
+  -fx-alignment: center;
+}
+
+/* TextField styles */
+.styled-textfield {
+  -fx-background-color: #333333;
+  -fx-text-fill: white;
+  -fx-border-color: #4CAF50;
+  -fx-border-width: 1px;
+  -fx-border-radius: 3px;
+}
+
+/* Disabled button states */
+.game-button:disabled {
+  -fx-opacity: 0.7;
+}
+
+.play-button:disabled {
+  -fx-background-color: #76ab78;
+}
+
+.fold-button:disabled {
+  -fx-background-color: #c17b74;
+}
+.card {
+  -fx-background-color: #2d2d2d !important;
+  -fx-border-color: #4a4a4a !important;
+  -fx-border-width: 2px !important;
+  -fx-border-radius: 10px !important;
+  -fx-background-radius: 10px !important;
+  -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 5, 0, 0, 0) !important;
+}
+
+.card-text {
+  -fx-fill: #00ff00 !important;  /* Green text for dark mode */
+  -fx-font-family: "System" !important;
+  -fx-font-weight: bold !important;
+  -fx-font-size: 24px !important;  /* Increased from default */
+}
+
+.card-heart, .card-diamond {
+  -fx-fill: #ff4444 !important;  /* Red suits */
+  -fx-font-size: 36px !important;  /* Bigger suit symbols */
+}
+
+.card-spade, .card-club {
+  -fx-fill: #ffffff !important;  /* White suits */
+  -fx-font-size: 36px !important;  /* Bigger suit symbols */
+}
+
+.card-back {
+  -fx-background-color: #1a1a1a !important;
+  -fx-border-color: #4a4a4a !important;
+  -fx-background-size: 20px 20px !important;
+  -fx-background-position: 0 0, 0 10px, 10px -10px, -10px 0px !important;
+}
+
+.rules-dialog-title {
+  -fx-font-size: 24px;
+  -fx-font-weight: bold;
+  -fx-text-fill: white;
+  -fx-padding: 0 0 10 0;
+}
+
+.rules-button {
+  -fx-background-color: #2196F3;
+  -fx-text-fill: white;
+  -fx-font-size: 14px;
+  -fx-padding: 8 15;
+  -fx-background-radius: 5;
+  -fx-cursor: hand;
+}
+
+.rules-button:hover {
+  -fx-background-color: #1976D2;
+}
+
+.rules-button:pressed {
+  -fx-background-color: #0D47A1;
+}
+
+.rules-content {
+  -fx-background-color: #2b2b2b;
+  -fx-text-fill: white;
+  -fx-spacing: 15;
+  -fx-padding: 20;
+}
+
+.rules-content .label {
+  -fx-text-fill: white;
+}
+
+.rules-scroll-pane {
+  -fx-background: #2b2b2b;
+  -fx-fit-to-width: true;
+  -fx-pref-viewport-height: 400;
+}
+
+.rules-scroll-pane .viewport {
+  -fx-background-color: #2b2b2b;
+}
+
+.rule-section {
+  -fx-background-color: #3b3b3b;
+  -fx-padding: 10;
+  -fx-background-radius: 5;
+  -fx-spacing: 5;
+}
+
+.rule-section .label {
+  -fx-wrap-text: true;
+}
+
+.rule-title {
+  -fx-font-weight: bold;
+  -fx-font-size: 16px;
+  -fx-text-fill: #4CAF50;
+}
+
+.rules-button-box {
+  -fx-alignment: center;
+  -fx-padding: 10 0 0 0;
+}
+.exit-root {
+  -fx-background-color: #1a1a1a;
+  -fx-padding: 20;
+  -fx-spacing: 20;
+  -fx-alignment: center;
+}
+
+.exit-text {
+  -fx-font-family: "Arial";
+  -fx-font-size: 28px;
+  -fx-fill: white;
+}
+
+.standings-text {
+  -fx-font-family: "Arial";
+  -fx-font-size: 16px;
+  -fx-fill: lightgray;
+  -fx-text-alignment: center;
+}
+
+.button-box {
+  -fx-spacing: 20;
+  -fx-alignment: center;
+}
+
+.continue-button {
+  -fx-background-color: #4CAF50;
+  -fx-text-fill: white;
+  -fx-font-size: 16px;
+  -fx-padding: 10 20 10 20;
+  -fx-min-width: 150px;
+  -fx-cursor: hand;
+}
+
+.continue-button:hover {
+  -fx-background-color: #45a049;
+}
+
+.quit-button {
+  -fx-background-color: #f44336;
+  -fx-text-fill: white;
+  -fx-font-size: 16px;
+  -fx-padding: 10 20 10 20;
+  -fx-min-width: 150px;
+  -fx-cursor: hand;
+}
+
+.quit-button:hover {
+  -fx-background-color: #d32f2f;
+}
+
+.winnings-label {
+  -fx-text-fill: #00ff00;
+  -fx-font-size: 14px;
+  -fx-font-weight: bold;
+}

@@ -1,6 +1,7 @@
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -908,130 +909,139 @@ public class JavaFXTemplate extends Application {
             }
         }
     }
+private String determineWinner(ArrayList<Card> dealer, ArrayList<Card> player, int anteBet, int playBet) {
+    // First check if dealer qualifies (Queen high or better)
+    ArrayList<Integer> dealerValues = new ArrayList<>();
+    for (Card card : dealer) {
+        dealerValues.add(card.getValue());
+    }
+    Collections.sort(dealerValues, Collections.reverseOrder());
+    
+    // If dealer doesn't qualify (less than Queen high)
+    if (dealerValues.get(0) < 12) {
+        return "Dealer does not qualify (less than Queen high)";
+    }
+    
+    // If dealer qualifies, compare hands using existing ThreeCardLogic method
+    int result = ThreeCardLogic.compareHands(dealer, player);
+    
+    switch (result) {
+        case 1: return "Dealer wins";
+        case 2: return "You win";
+        default: return "It's a tie";
+    }
+}
 
-    private void evaluateRound() {
-        currentState = GameState.ROUND_COMPLETE;
+private void evaluateRound() {
+    currentState = GameState.ROUND_COMPLETE;
 
-        // First evaluate Pair Plus for both players (this should happen regardless of dealer qualification)
-        int player1PairPlus = ThreeCardLogic.evalPPWinnings(player1Hand, playerOne.pairPlusBet);
-        int player2PairPlus = ThreeCardLogic.evalPPWinnings(player2Hand, playerTwo.pairPlusBet);
+    // First evaluate Pair Plus for both players
+    int player1PairPlus = ThreeCardLogic.evalPPWinnings(player1Hand, playerOne.pairPlusBet);
+    int player2PairPlus = ThreeCardLogic.evalPPWinnings(player2Hand, playerTwo.pairPlusBet);
 
-        // Add Pair Plus winnings immediately
-        playerOne.totalWinnings += player1PairPlus;
-        playerTwo.totalWinnings += player2PairPlus;
+    // Add Pair Plus winnings immediately
+    playerOne.totalWinnings += player1PairPlus;
+    playerTwo.totalWinnings += player2PairPlus;
 
-        // Calculate main game results
-        String player1Result = ThreeCardLogic.determineWinner(dealerHand, player1Hand,
-                playerOne.anteBet, playerOne.playBet);
-        String player2Result = ThreeCardLogic.determineWinner(dealerHand, player2Hand,
-                playerTwo.anteBet, playerTwo.playBet);
+    // Calculate main game results using our helper method
+    String player1Result = determineWinner(dealerHand, player1Hand, playerOne.anteBet, playerOne.playBet);
+    String player2Result = determineWinner(dealerHand, player2Hand, playerTwo.anteBet, playerTwo.playBet);
 
-        // Create containers for side-by-side display
-        HBox resultsContainer = new HBox(40);
-        resultsContainer.setAlignment(Pos.CENTER);
-        resultsContainer.getStyleClass().add("results-container");
+    // Create containers for side-by-side display
+    HBox resultsContainer = new HBox(40);
+    resultsContainer.setAlignment(Pos.CENTER);
+    resultsContainer.getStyleClass().add("results-container");
 
-        VBox player1Results = new VBox(5);
-        VBox player2Results = new VBox(5);
-
-        // Build Player 1 results
-        StringBuilder p1Result = new StringBuilder();
-        StringBuilder p2Result = new StringBuilder();
-
-        // Add pair plus results first
-        p1Result.append("Player 1:\n");
-        if (player1PairPlus > 0) {
-            p1Result.append("Pair Plus Winnings: $").append(player1PairPlus).append("\n");
+    // Process results for both players
+    VBox[] playerResults = {new VBox(5), new VBox(5)};
+    StringBuilder[] results = {new StringBuilder(), new StringBuilder()};
+    Player[] players = {playerOne, playerTwo};
+    int[] pairPlusWinnings = {player1PairPlus, player2PairPlus};
+    String[] gameResults = {player1Result, player2Result};
+    
+    for (int i = 0; i < 2; i++) {
+        StringBuilder result = results[i];
+        Player player = players[i];
+        int pairPlus = pairPlusWinnings[i];
+        String gameResult = gameResults[i];
+        
+        // Build result text
+        result.append("Player ").append(i + 1).append(":\n");
+        if (pairPlus > 0) {
+            result.append("Pair Plus Winnings: $").append(pairPlus).append("\n");
         }
-        p1Result.append(player1Result).append("\n");
-
-        p2Result.append("Player 2:\n");
-        if (player2PairPlus > 0) {
-            p2Result.append("Pair Plus Winnings: $").append(player2PairPlus).append("\n");
-        }
-        p2Result.append(player2Result).append("\n");
+        result.append(gameResult).append("\n");
 
         // Handle main game results
-        if (player1Result.contains("Dealer does not qualify")) {
-            p1Result.append("Play bet returned: $").append(playerOne.playBet).append("\n");
-            player1PushedAntes += playerOne.anteBet;
-            p1Result.append("Ante pushes to next hand (Total pushed: $")
-                    .append(player1PushedAntes).append(")\n");
-            playerOne.playBet = 0;
-        } else if (player1Result.contains("It's a tie")) {
-            p1Result.append("Tie - bets returned\n");
-        } else if (player1Result.contains("You win")) {
-            int mainGameWinnings = (playerOne.anteBet + playerOne.playBet);
-            playerOne.totalWinnings += mainGameWinnings;
-            if (player1PushedAntes > 0) {
-                playerOne.totalWinnings += player1PushedAntes;
-                p1Result.append("Won pushed antes: $").append(player1PushedAntes).append("\n");
-                player1PushedAntes = 0;
-            }
-            p1Result.append("Main Game Winnings: $").append(mainGameWinnings).append("\n");
-        } else if (player1Result.contains("Dealer wins")) {
-            p1Result.append("Main Game Loss\n");
-            if (player1PushedAntes > 0) {
-                p1Result.append("Lost pushed antes: $").append(player1PushedAntes).append("\n");
-                player1PushedAntes = 0;
-            }
+        if (gameResult.contains("Dealer does not qualify")) {
+            handleDealerNotQualified(result, player, i);
+        } else if (gameResult.contains("It's a tie")) {
+            result.append("Tie - bets returned\n");
+        } else if (gameResult.contains("You win")) {
+            handlePlayerWin(result, player, i);
+        } else if (gameResult.contains("Dealer wins")) {
+            handlePlayerLoss(result, player, i);
         }
 
-        // Handle Player 2 results similarly
-        if (player2Result.contains("Dealer does not qualify")) {
-            p2Result.append("Play bet returned: $").append(playerTwo.playBet).append("\n");
-            player2PushedAntes += playerTwo.anteBet;
-            p2Result.append("Ante pushes to next hand (Total pushed: $")
-                    .append(player2PushedAntes).append(")\n");
-            playerTwo.playBet = 0;
-        } else if (player2Result.contains("It's a tie")) {
-            p2Result.append("Tie - bets returned\n");
-        } else if (player2Result.contains("You win")) {
-            int mainGameWinnings = (playerTwo.anteBet + playerTwo.playBet);
-            playerTwo.totalWinnings += mainGameWinnings;
-            if (player2PushedAntes > 0) {
-                playerTwo.totalWinnings += player2PushedAntes;
-                p2Result.append("Won pushed antes: $").append(player2PushedAntes).append("\n");
-                player2PushedAntes = 0;
-            }
-            p2Result.append("Main Game Winnings: $").append(mainGameWinnings).append("\n");
-        } else if (player2Result.contains("Dealer wins")) {
-            p2Result.append("Main Game Loss\n");
-            if (player2PushedAntes > 0) {
-                p2Result.append("Lost pushed antes: $").append(player2PushedAntes).append("\n");
-                player2PushedAntes = 0;
-            }
-        }
-
-        // Create and style labels for results
-        Label player1ResultLabel = new Label(p1Result.toString());
-        Label player2ResultLabel = new Label(p2Result.toString());
-
-        player1ResultLabel.getStyleClass().add("game-info-text");
-        player2ResultLabel.getStyleClass().add("game-info-text");
-
-        // Add results to their containers
-        player1Results.getChildren().add(player1ResultLabel);
-        player2Results.getChildren().add(player2ResultLabel);
-
-        resultsContainer.getChildren().addAll(player1Results, player2Results);
-
-        // Update displays
-        gameInfoLabel.setText("Results:");
-
-        // Clear previous results if any
-        dealerArea.getChildren().removeIf(node -> node instanceof HBox
-                && ((HBox) node).getStyleClass().contains("results-container"));
-
-        // Add new results
-        dealerArea.getChildren().add(resultsContainer);
-
-        // Update other UI elements
-        updatePushedAntesDisplay();
-        updateWinningsDisplays();
-        playAgainBox.setVisible(true);
-        dealButton.setDisable(false);
+        // Create and add result label
+        Label resultLabel = new Label(result.toString());
+        resultLabel.getStyleClass().add("game-info-text");
+        playerResults[i].getChildren().add(resultLabel);
     }
+
+    resultsContainer.getChildren().addAll(playerResults);
+
+    // Update UI
+    gameInfoLabel.setText("Results:");
+    dealerArea.getChildren().removeIf(node -> 
+        node instanceof HBox && ((HBox) node).getStyleClass().contains("results-container")
+    );
+    dealerArea.getChildren().add(resultsContainer);
+
+    // Final updates
+    updatePushedAntesDisplay();
+    updateWinningsDisplays();
+    playAgainBox.setVisible(true);
+    dealButton.setDisable(false);
+}
+
+private void handleDealerNotQualified(StringBuilder result, Player player, int playerIndex) {
+    result.append("Play bet returned: $").append(player.playBet).append("\n");
+    if (playerIndex == 0) {
+        player1PushedAntes += player.anteBet;
+        result.append("Ante pushes to next hand (Total pushed: $")
+              .append(player1PushedAntes).append(")\n");
+    } else {
+        player2PushedAntes += player.anteBet;
+        result.append("Ante pushes to next hand (Total pushed: $")
+              .append(player2PushedAntes).append(")\n");
+    }
+    player.playBet = 0;
+}
+
+private void handlePlayerWin(StringBuilder result, Player player, int playerIndex) {
+    int mainGameWinnings = (player.anteBet + player.playBet);
+    player.totalWinnings += mainGameWinnings;
+    
+    int pushedAntes = playerIndex == 0 ? player1PushedAntes : player2PushedAntes;
+    if (pushedAntes > 0) {
+        player.totalWinnings += pushedAntes;
+        result.append("Won pushed antes: $").append(pushedAntes).append("\n");
+        if (playerIndex == 0) player1PushedAntes = 0;
+        else player2PushedAntes = 0;
+    }
+    result.append("Main Game Winnings: $").append(mainGameWinnings).append("\n");
+}
+
+private void handlePlayerLoss(StringBuilder result, Player player, int playerIndex) {
+    result.append("Main Game Loss\n");
+    int pushedAntes = playerIndex == 0 ? player1PushedAntes : player2PushedAntes;
+    if (pushedAntes > 0) {
+        result.append("Lost pushed antes: $").append(pushedAntes).append("\n");
+        if (playerIndex == 0) player1PushedAntes = 0;
+        else player2PushedAntes = 0;
+    }
+}
 
     // Update the updateWinningsDisplays method to only show positive numbers
     private void updateWinningsDisplays() {
