@@ -26,70 +26,52 @@ import javafx.stage.Stage;
 
 public class JavaFXTemplate extends Application {
 
-    // Constants
-    private static final double SCENE_WIDTH = 1200;
-    private static final double SCENE_HEIGHT = 800;
-    private static final double CARD_WIDTH = 100;
-    private static final double CARD_HEIGHT = 140;
+    private static final double SCENE_WIDTH = 1200, SCENE_HEIGHT = 800,
+            CARD_WIDTH = 100, CARD_HEIGHT = 140;
 
-    // Enums
     private enum GameState {
         PLAYER_ONE_TURN, PLAYER_TWO_TURN, ROUND_COMPLETE
     }
 
-    // Game components
-    private final Player playerOne = new Player();
-    private final Player playerTwo = new Player();
+// Game components and state
+    private final Player playerOne = new Player(), playerTwo = new Player();
     private final Dealer theDealer = new Dealer();
     private GameState currentState;
     private String currentTheme = "default";
 
-    // Hands
-    private ArrayList<Card> dealerHand;
-    private ArrayList<Card> player1Hand;
-    private ArrayList<Card> player2Hand;
+// Hands
+    private ArrayList<Card> dealerHand, player1Hand, player2Hand;
 
-    // UI Stage and Scenes
+// UI Stage and Scenes
     private Stage primaryStage;
-    private Scene startScene;
-    private Scene gameScene;
-    private Scene exitScene;
+    private Scene startScene, gameScene, exitScene;
 
-    // UI Components - Dealer
+// UI Components - Dealer
     private Button dealButton;
     private HBox dealerCards;
     private VBox dealerArea;
 
-    // UI Components - Player 1
-    private TextField player1AnteField;
-    private TextField player1PairPlusField;
-    private Button player1PlayButton;
-    private Button player1FoldButton;
+// UI Components - Player 1
+    private TextField player1AnteField, player1PairPlusField;
+    private Button player1PlayButton, player1FoldButton;
     private VBox player1Area;
     private HBox player1Cards;
-    private Label player1TotalWinningsLabel;
-    private Label player1PushedAntesLabel;
+    private Label player1TotalWinningsLabel, player1PushedAntesLabel;
     private int player1PushedAntes = 0;
 
-    // UI Components - Player 2
-    private TextField player2AnteField;
-    private TextField player2PairPlusField;
-    private Button player2PlayButton;
-    private Button player2FoldButton;
+// UI Components - Player 2
+    private TextField player2AnteField, player2PairPlusField;
+    private Button player2PlayButton, player2FoldButton;
     private VBox player2Area;
     private HBox player2Cards;
-    private Label player2TotalWinningsLabel;
-    private Label player2PushedAntesLabel;
+    private Label player2TotalWinningsLabel, player2PushedAntesLabel;
     private int player2PushedAntes = 0;
 
-    // Additional UI
+// Additional UI and game state
     private HBox playAgainBox;
     private Label gameInfoLabel;
     private MenuItem newLookItem;
-    private boolean player1InitialBetMade = false;
-    private boolean player2InitialBetMade = false;
-    private boolean player1PlayDecisionMade = false;
-    private boolean player2PlayDecisionMade = false;
+    private boolean player1InitialBetMade, player2InitialBetMade, player1PlayDecisionMade, player2PlayDecisionMade;
 
     @Override
     public void start(Stage primaryStage) {
@@ -605,8 +587,8 @@ public class JavaFXTemplate extends Application {
             player.totalWinnings += pushedAntes;
             result.append("Won pushed antes: $").append(pushedAntes).append("\n");
             if (playerIndex == 0) {
-                player1PushedAntes = 0; 
-            }else {
+                player1PushedAntes = 0;
+            } else {
                 player2PushedAntes = 0;
             }
         }
@@ -619,8 +601,8 @@ public class JavaFXTemplate extends Application {
         if (pushedAntes > 0) {
             result.append("Lost pushed antes: $").append(pushedAntes).append("\n");
             if (playerIndex == 0) {
-                player1PushedAntes = 0; 
-            }else {
+                player1PushedAntes = 0;
+            } else {
                 player2PushedAntes = 0;
             }
         }

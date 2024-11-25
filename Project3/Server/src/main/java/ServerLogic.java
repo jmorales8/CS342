@@ -1,3 +1,4 @@
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -6,6 +7,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class ServerLogic {
+
     private ServerSocket serverSocket;
     private ExecutorService executorService;
     private volatile boolean isRunning;
@@ -27,16 +29,16 @@ public class ServerLogic {
             serverSocket = new ServerSocket(port);
             currentPort = port;
             isRunning = true;
-            
+
             if (gui != null) {
                 gui.updateLog("Server started on port " + port);
             }
-            
+
             // Start accepting clients on a separate thread
             Thread acceptThread = new Thread(this::acceptClients);
             acceptThread.setDaemon(true);
             acceptThread.start();
-            
+
             return true;
         } catch (IOException e) {
             if (gui != null) {
@@ -53,7 +55,7 @@ public class ServerLogic {
                 ClientHandler clientHandler = new ClientHandler(clientSocket, this);
                 clients.add(clientHandler);
                 executorService.submit(clientHandler);
-                
+
                 if (gui != null) {
                     gui.updateLog("New client connected");
                 }
@@ -71,16 +73,16 @@ public class ServerLogic {
             if (serverSocket != null && !serverSocket.isClosed()) {
                 serverSocket.close();
             }
-            
+
             for (ClientHandler client : clients) {
                 client.closeConnection();
             }
             clients.clear();
-            
+
             if (executorService != null) {
                 executorService.shutdown();
             }
-            
+
             if (gui != null) {
                 gui.updateLog("Server stopped");
             }
@@ -97,6 +99,7 @@ public class ServerLogic {
             gui.updateLog("Client disconnected");
         }
     }
+
     public void logMessage(String message) {
         if (gui != null) {
             gui.updateLog(message);
