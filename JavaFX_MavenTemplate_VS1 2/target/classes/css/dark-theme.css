@@ -17,20 +17,22 @@
 /* Menu styling */
 .menu-bar {
   -fx-background-color: #333333;
-  -fx-padding: 3px;
+  -fx-padding: 0;
+  -fx-width: 100%;
 }
 
 .menu {
-  -fx-padding: 3px 6px;
+  -fx-padding: 5 10;
+  -fx-background-color: transparent;
 }
 
-.menu > .label {
+.menu .label {
   -fx-text-fill: white;
 }
 
 .menu-item {
+  -fx-padding: 5 10;
   -fx-background-color: #333333;
-  -fx-padding: 5px 10px;
 }
 
 .menu-item .label {

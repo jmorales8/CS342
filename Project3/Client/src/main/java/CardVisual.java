@@ -1,4 +1,3 @@
-
 import javafx.geometry.Pos;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
@@ -7,7 +6,6 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
 public class CardVisual extends StackPane {
-
     private Rectangle background;
     private Text displayText;
     private Card card;
@@ -34,7 +32,7 @@ public class CardVisual extends StackPane {
 
     private String getDisplayString() {
         String valueStr = getValueString();
-        String suitStr = String.valueOf(card.getSuit());
+        String suitStr = getSuitSymbol(card);
         return valueStr + "\n" + suitStr;
     }
 
@@ -51,6 +49,21 @@ public class CardVisual extends StackPane {
                 return "J";
             default:
                 return String.valueOf(value);
+        }
+    }
+
+    private String getSuitSymbol(Card card) {
+        switch (card.getSuit()) {
+            case 'H':
+                return "♥";
+            case 'D':
+                return "♦";
+            case 'C':
+                return "♣";
+            case 'S':
+                return "♠";
+            default:
+                return String.valueOf(card.getSuit());
         }
     }
 

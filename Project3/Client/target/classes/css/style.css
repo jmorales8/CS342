@@ -35,8 +35,20 @@
 }
 .root {
   -fx-background-color: #1a1a1a;
+  -fx-padding: 0;
+  -fx-background-insets: 0;
 }
 
+/* Ensure no extra space in BorderPane */
+.border-pane {
+  -fx-padding: 0;
+  -fx-background-insets: 0;
+}
+
+/* Clear any default spacing */
+.vbox, .hbox {
+  -fx-background-insets: 0;
+}
 /* Text styles */
 .title-text {
   -fx-font-family: "Arial";

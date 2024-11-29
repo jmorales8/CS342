@@ -330,3 +330,40 @@
   -fx-font-size: 14px;
   -fx-font-weight: bold;
 }
+
+.player-area {
+  -fx-padding: 10px;
+  -fx-border-color: #333333;
+  -fx-alignment: center;
+  -fx-min-width: 400px; /* Add a minimum width to ensure proper centering */
+}
+
+.card-container {
+  -fx-spacing: 10;
+  -fx-alignment: center;
+  -fx-min-width: 400px; /* Add a minimum width for proper card spacing */
+}
+
+.button-container {
+  -fx-spacing: 10;
+  -fx-alignment: center;
+  -fx-padding: 10 0;
+}
+
+.dealer-label, .player-label, .game-info-label, .winnings-label, .pushed-antes-label {
+  -fx-alignment: center;
+  -fx-text-alignment: center;
+}
+
+.styled-textfield {
+  -fx-alignment: center;
+  -fx-min-width: 150px;
+  -fx-max-width: 200px;
+}
+
+/* Add container for bet fields */
+.bet-fields-container {
+  -fx-alignment: center;
+  -fx-spacing: 10;
+  -fx-padding: 10 0;
+}
