@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
 
 public class ClientHandler implements Runnable {
 
@@ -19,37 +20,29 @@ public class ClientHandler implements Runnable {
         this.isRunning = true;
     }
 
-// In ClientHandler class, modify the run() method's message handling:
-    @Override
-    public void run() {
-        try {
-            out = new ObjectOutputStream(clientSocket.getOutputStream());
-            in = new ObjectInputStream(clientSocket.getInputStream());
+@Override
+public void run() {
+    try {
+        out = new ObjectOutputStream(clientSocket.getOutputStream());
+        in = new ObjectInputStream(clientSocket.getInputStream());
 
-            while (isRunning) {
-                try {
-                    Object message = in.readObject();
-                    if (message != null) {
-                        // Handle ping specifically
-                        if (message.equals("PING")) {
-                            server.logMessage("Ping received from client");
-                            // Send pong back to client
-                            sendMessage("PONG");
-                        } else {
-                            // Handle other messages
-                            server.logMessage("Received from client: " + message.toString());
-                        }
-                    }
-                } catch (EOFException e) {
-                    break;
+        while (isRunning) {
+            try {
+                Object message = in.readObject();
+                if (message instanceof PokerInfo) {
+                    PokerInfo info = (PokerInfo) message;
+                    handlePokerInfo(info);
                 }
+            } catch (EOFException e) {
+                break;
             }
-        } catch (IOException | ClassNotFoundException e) {
-            server.logMessage("Error in client handler: " + e.getMessage());
-        } finally {
-            closeConnection();
         }
+    } catch (IOException | ClassNotFoundException e) {
+        server.logMessage("Error in client handler: " + e.getMessage());
+    } finally {
+        closeConnection();
     }
+}
 
     public void closeConnection() {
         isRunning = false;
@@ -69,12 +62,41 @@ public class ClientHandler implements Runnable {
         server.removeClient(this);
     }
 
-    public void sendMessage(String message) {
-        try {
-            out.writeObject(message);
-            out.flush();
-        } catch (IOException e) {
-            server.logMessage("Error sending message to client: " + e.getMessage());
+
+private void handlePokerInfo(PokerInfo info) {
+    try {
+        switch (info.getMessageType()) {
+            case PLACE_BETS:
+                // Use Dealer to generate cards
+                Dealer dealer = new Dealer();
+                ArrayList<Card> playerCards = dealer.dealHand();
+                ArrayList<Card> dealerCards = dealer.dealHand();
+
+                // Create response with cards
+                PokerInfo response = new PokerInfo();
+                response.setMessageType(PokerInfo.MessageType.DEAL_CARDS);
+                response.setPlayerCards(playerCards);
+                response.setDealerCards(dealerCards);
+
+                // Send to client
+                out.writeObject(response);
+                out.flush();
+
+                server.logMessage("Dealt cards to client");
+                break;
+
         }
+    } catch (IOException e) {
+        server.logMessage("Error sending response: " + e.getMessage());
     }
+}
+
+public void sendPokerInfo(PokerInfo info) {
+    try {
+        out.writeObject(info);
+        out.flush();
+    } catch (IOException e) {
+        server.logMessage("Error sending poker info: " + e.getMessage());
+    }
+}
 }

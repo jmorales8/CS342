@@ -1,8 +1,9 @@
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
-
-public class Deck extends ArrayList<Card> {
+public class Deck extends ArrayList<Card> implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     public Deck() {
         newDeck();

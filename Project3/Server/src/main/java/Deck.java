@@ -1,9 +1,8 @@
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
-
-public class Deck extends ArrayList<Card> {
-
+public class Deck extends ArrayList<Card> implements Serializable {
     public Deck() {
         newDeck();
     }

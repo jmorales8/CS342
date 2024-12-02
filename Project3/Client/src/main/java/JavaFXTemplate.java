@@ -130,22 +130,22 @@ public class JavaFXTemplate extends Application {
         Dialog<Integer> dialog = new Dialog<>();
         dialog.setTitle("Server Connection");
         dialog.setHeaderText("Enter Server Details");
-    
+
         // Create the dialog content
         TextField portField = new TextField("8080");
         portField.setPromptText("Port Number");
-        
+
         VBox content = new VBox(10);
         content.getChildren().addAll(
-            new Label("Port:"), 
-            portField
+                new Label("Port:"),
+                portField
         );
         dialog.getDialogPane().setContent(content);
-    
+
         // Add buttons
         ButtonType connectButtonType = new ButtonType("Connect", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(connectButtonType, ButtonType.CANCEL);
-    
+
         // Convert the result
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == connectButtonType) {
@@ -157,7 +157,7 @@ public class JavaFXTemplate extends Application {
             }
             return null;
         });
-    
+
         // Show dialog and handle result
         Optional<Integer> result = dialog.showAndWait();
         result.ifPresent(port -> {
@@ -178,14 +178,66 @@ public class JavaFXTemplate extends Application {
         }
     }
 
+    private void handleServerResponse(PokerInfo info) {
+        switch (info.getMessageType()) {
+            case DEAL_CARDS:
+                // Display player's cards
+                displayCards(playerCards, info.getPlayerCards(), false);
+                // Display dealer's cards face down
+                displayCards(dealerCards, info.getDealerCards(), true);
+                break;
+
+            case DEALER_CARDS:
+                // Reveal dealer's cards
+                displayCards(dealerCards, info.getDealerCards(), false);
+                break;
+
+            case GAME_RESULT:
+                // Update UI with game results
+                gameInfoLabel.setText(info.getResultMessage());
+                player.totalWinnings = info.getTotalWinnings();
+                playerPushedAntes = info.getPushedAntes();
+                updateWinningsDisplay();
+                updatePushedAntesDisplay();
+                playAgainBox.setVisible(true);
+                playAgainBox.setManaged(true);
+                break;
+        }
+    }
+
+    private void startNewRound() {
+        try {
+            // Send new game request to server
+            out.writeObject(PokerInfo.newGame());
+            out.flush();
+
+            // Reset UI
+            initialBetMade = false;
+            playDecisionMade = false;
+            dealerCards.getChildren().clear();
+            playerCards.getChildren().clear();
+            resetUI();
+
+        } catch (IOException e) {
+            gameInfoLabel.setText("Error starting new game");
+        }
+    }
+
+    private void displayCards(HBox container, ArrayList<Card> cards, boolean faceDown) {
+        container.getChildren().clear();
+        for (Card card : cards) {
+            StackPane cardNode = createCardNode(card, faceDown);
+            container.getChildren().add(cardNode);
+        }
+    }
+
     private void listenForServerMessages() {
         try {
             while (socket != null && !socket.isClosed()) {
                 Object message = in.readObject();
-                if (message != null) {
-                    Platform.runLater(() -> {
-                        System.out.println("Received from server: " + message);
-                    });
+                if (message instanceof PokerInfo) {
+                    PokerInfo info = (PokerInfo) message;
+                    Platform.runLater(() -> handleServerResponse(info));
                 }
             }
         } catch (IOException | ClassNotFoundException e) {
@@ -733,55 +785,45 @@ public class JavaFXTemplate extends Application {
                 int anteBet = Integer.parseInt(playerAnteField.getText());
                 int pairPlusBet = 0;
 
-                if (anteBet < 5 || anteBet > 25) {
-                    gameInfoLabel.setText("Ante bet must be between $5 and $25");
-                    return;
-                }
-
                 if (!playerPairPlusField.getText().isEmpty()) {
                     pairPlusBet = Integer.parseInt(playerPairPlusField.getText());
-                    if (pairPlusBet < 5 || pairPlusBet > 25) {
-                        gameInfoLabel.setText("Pair Plus bet must be between $5 and $25");
-                        return;
-                    }
                 }
 
-                player.anteBet = anteBet;
-                player.pairPlusBet = pairPlusBet;
-                initialBetMade = true;
+                // Create and send bet info to server
+                PokerInfo betInfo = new PokerInfo();
+                betInfo.setMessageType(PokerInfo.MessageType.PLACE_BETS);
+                betInfo.setAnteBet(anteBet);
+                betInfo.setPairPlusBet(pairPlusBet);
 
+                out.writeObject(betInfo);
+                out.flush();
+
+                // Disable bet fields after sending
                 playerAnteField.setDisable(true);
                 playerPairPlusField.setDisable(true);
-                playerPlayButton.setText("Make Play Bet (" + anteBet + ")");
-                playerFoldButton.setText("Fold");
 
-                for (javafx.scene.Node node : playerCards.getChildren()) {
-                    if (node instanceof StackPane) {
-                        setCardFaceUp((StackPane) node);
-                    }
-                }
+                initialBetMade = true;
 
-                checkInitialBet(); // Call the helper method here
-            } catch (NumberFormatException e) {
-                gameInfoLabel.setText("Please enter valid bets");
+            } catch (IOException e) {
+                System.err.println("Error sending bets to server: " + e.getMessage());
             }
         } else {
-            if (isPlay) {
-                player.playBet = player.anteBet;
-            } else {
-                player.anteBet = 0;
-                player.playBet = 0;
-                player.pairPlusBet = 0;
+            try {
+                // Send play/fold decision to server
+                PokerInfo decision = PokerInfo.playDecision(!isPlay, isPlay ? player.anteBet : 0);
+                out.writeObject(decision);
+                out.flush();
+
+                playDecisionMade = true;
+                playerPlayButton.setDisable(true);
+                playerFoldButton.setDisable(true);
+                String buttonText = isPlay ? "Play Bet Made" : "Folded";
+                playerPlayButton.setText(buttonText);
+                playerFoldButton.setText(buttonText);
+
+            } catch (IOException e) {
+                gameInfoLabel.setText("Error communicating with server");
             }
-
-            playDecisionMade = true;
-            playerPlayButton.setDisable(true);
-            playerFoldButton.setDisable(true);
-            String buttonText = isPlay ? "Play Bet Made" : "Folded";
-            playerPlayButton.setText(buttonText);
-            playerFoldButton.setText(buttonText);
-
-            checkPlayDecision(); // Call the helper method here
         }
     }
 
@@ -954,40 +996,6 @@ public class JavaFXTemplate extends Application {
         gameInfoLabel.setText("Player: Place your ante bet");
         playAgainBox.setVisible(false);
         dealButton.setDisable(true);
-    }
-
-    private void startNewRound() {
-        // Reset betting flags
-        initialBetMade = false;
-        playDecisionMade = false;
-
-        // Deal cards
-        dealerHand = theDealer.dealHand();
-        playerHand = theDealer.dealHand();
-
-        // Clear and reset displays
-        dealerCards.getChildren().clear();
-        playerCards.getChildren().clear();
-
-        // Clear previous results
-        dealerArea.getChildren().removeIf(node
-                -> node instanceof VBox
-                || (node instanceof HBox && ((HBox) node).getStyleClass().contains("results-container"))
-        );
-
-        // Add cards face down initially
-        for (int i = 0; i < 3; i++) {
-            StackPane dealerCard = createCardNode(dealerHand.get(i), true);
-            StackPane playerCard = createCardNode(playerHand.get(i), true);
-
-            dealerCards.getChildren().add(dealerCard);
-            playerCards.getChildren().add(playerCard);
-        }
-
-        // Reset UI
-        updateTotalWinningsLabelStyle();
-        updatePushedAntesDisplay();
-        resetUI();
     }
 
     private void showStartScreen() {

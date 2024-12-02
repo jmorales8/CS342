@@ -1,11 +1,15 @@
+PokerInfo$MessageType.class
+ClientHandler$1.class
 CardVisual.class
+GameLogic.class
 Deck.class
 Player.class
 ThreeCardLogic.class
+PokerInfo.class
 ClientHandler.class
+JavaFXTemplate.class
+ServerLogic.class
 ServerApp.class
 Card.class
 ServerGUI.class
 Dealer.class
-JavaFXTemplate.class
-ServerLogic.class
