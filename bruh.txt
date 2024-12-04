@@ -1,1 +1,3 @@
+cd Project3/ && cd Client && mvn clean compile exec:java
+cd Project3/ && cd Server && mvn clean compile exec:java
 mvn clean compile exec:java

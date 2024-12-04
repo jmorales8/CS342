@@ -12,7 +12,6 @@ import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
@@ -178,29 +177,48 @@ public class JavaFXTemplate extends Application {
         }
     }
 
+// Add these to your client-side code
+    private void monitorMoneyChanges(PokerInfo info) {
+        System.out.println("====== Money Update Received ======");
+        System.out.println("Previous Total: $" + player.totalWinnings);
+        System.out.println("New Total: $" + info.getTotalWinnings());
+        System.out.println("Change: $" + (info.getTotalWinnings() - player.totalWinnings));
+        System.out.println("Pushed Antes: $" + info.getPushedAntes());
+        System.out.println("Result Message: " + info.getResultMessage());
+        System.out.println("================================");
+    }
+
     private void handleServerResponse(PokerInfo info) {
+        // Add monitoring before processing
+        monitorMoneyChanges(info);
+
         switch (info.getMessageType()) {
             case DEAL_CARDS:
-                // Display player's cards
                 displayCards(playerCards, info.getPlayerCards(), false);
-                // Display dealer's cards face down
                 displayCards(dealerCards, info.getDealerCards(), true);
+                gameInfoLabel.setText("Cards dealt - make your play decision");
                 break;
 
             case DEALER_CARDS:
-                // Reveal dealer's cards
                 displayCards(dealerCards, info.getDealerCards(), false);
-                break;
-
-            case GAME_RESULT:
-                // Update UI with game results
                 gameInfoLabel.setText(info.getResultMessage());
-                player.totalWinnings = info.getTotalWinnings();
-                playerPushedAntes = info.getPushedAntes();
-                updateWinningsDisplay();
-                updatePushedAntesDisplay();
-                playAgainBox.setVisible(true);
-                playAgainBox.setManaged(true);
+
+                Platform.runLater(() -> {
+                    System.out.println("Updating UI with new totals:");
+                    System.out.println("Setting total winnings to: $" + info.getTotalWinnings());
+
+                    player.totalWinnings = info.getTotalWinnings();
+                    playerPushedAntes = info.getPushedAntes();
+
+                    updateWinningsDisplay();
+                    updatePushedAntesDisplay();
+
+                    System.out.println("After update - Label text: " + playerTotalWinningsLabel.getText());
+                    System.out.println("After update - Player total: $" + player.totalWinnings);
+
+                    playAgainBox.setVisible(true);
+                    playAgainBox.setManaged(true);
+                });
                 break;
         }
     }
@@ -242,20 +260,6 @@ public class JavaFXTemplate extends Application {
             }
         } catch (IOException | ClassNotFoundException e) {
             System.err.println("Error receiving server message: " + e.getMessage());
-        }
-    }
-
-    private void pingServer() {
-        if (out != null) {
-            try {
-                out.writeObject("PING");
-                out.flush();
-                System.out.println("Ping sent to server");
-            } catch (IOException e) {
-                System.err.println("Error pinging server: " + e.getMessage());
-            }
-        } else {
-            System.err.println("Not connected to server");
         }
     }
 
@@ -531,15 +535,8 @@ public class JavaFXTemplate extends Application {
         playerTotalWinningsLabel = createStyledLabel("Total Winnings: $0", "winnings-label");
         playerPushedAntesLabel = createStyledLabel("Pushed Antes: $0", "pushed-antes-label");
 
-        // Create ping server button
-        Button pingServerButton = createStyledButton("Ping Server", "#2196F3");
-        pingServerButton.setOnAction(e -> pingServer());
-
         HBox buttonContainer = createPlayerButtonContainer();
         setupPlayerButtons();
-
-        // Add ping button to button container
-        buttonContainer.getChildren().add(pingServerButton);
 
         // Add all components to player area
         area.getChildren().addAll(
@@ -552,17 +549,6 @@ public class JavaFXTemplate extends Application {
         );
 
         return area;
-    }
-
-// Helper method to show messages (add this if you don't have it)
-    private void showMessage(String message) {
-        Platform.runLater(() -> {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Server Communication");
-            alert.setHeaderText(null);
-            alert.setContentText(message);
-            alert.show();
-        });
     }
 
     private HBox createCardContainer() {
@@ -652,12 +638,6 @@ public class JavaFXTemplate extends Application {
         playAgainBox.getChildren().addAll(playAgainLabel, dealButton);
     }
 
-    private void checkInitialBet() {
-        if (initialBetMade) {
-            gameInfoLabel.setText("Player: Review your cards and make play bet or fold");
-        }
-    }
-
     private String determineWinner(ArrayList<Card> dealer, ArrayList<Card> player, int anteBet, int playBet) {
         // First check if dealer qualifies (Queen high or better)
         ArrayList<Integer> dealerValues = new ArrayList<>();
@@ -681,101 +661,6 @@ public class JavaFXTemplate extends Application {
                 return "You win";
             default:
                 return "It's a tie";
-        }
-    }
-
-    private void evaluateRound() {
-        currentState = GameState.ROUND_COMPLETE;
-
-        // Handle Pair Plus bet first
-        int pairPlusWinnings = ThreeCardLogic.evalPPWinnings(playerHand, player.pairPlusBet);
-        player.totalWinnings += pairPlusWinnings;
-
-        // Get the game result
-        String gameResult = determineWinner(dealerHand, playerHand, player.anteBet, player.playBet);
-
-        // Create results display
-        VBox resultsBox = new VBox(5);
-        resultsBox.setAlignment(Pos.CENTER);  // Center the VBox contents
-        StringBuilder result = new StringBuilder();
-
-        result.append("Results:\n");
-        if (pairPlusWinnings > 0) {
-            result.append("Pair Plus Winnings: $").append(pairPlusWinnings).append("\n");
-        }
-        result.append(gameResult).append("\n");
-
-        // Process results based on game outcome
-        if (gameResult.contains("Dealer does not qualify")) {
-            handleDealerNotQualified(result, player);
-        } else if (gameResult.contains("You win")) {
-            handlePlayerWin(result, player);
-        } else if (gameResult.contains("Dealer wins")) {
-            handlePlayerLoss(result, player);
-        }
-
-        // Display results with centered text
-        Label resultLabel = new Label(result.toString());
-        resultLabel.setAlignment(Pos.CENTER);  // Center the text within the label
-        resultLabel.setTextAlignment(javafx.scene.text.TextAlignment.CENTER);  // Center-align the text content
-        resultLabel.setMaxWidth(Double.MAX_VALUE);  // Allow label to take full width
-        resultLabel.getStyleClass().add("game-info-text");
-
-        resultsBox.getChildren().add(resultLabel);
-
-        // Update UI
-        gameInfoLabel.setText("Round Complete");
-        dealerArea.getChildren().removeIf(node
-                -> node instanceof HBox && ((HBox) node).getStyleClass().contains("results-container")
-        );
-        dealerArea.getChildren().add(resultsBox);
-
-        updatePushedAntesDisplay();
-        updateWinningsDisplay();
-        playAgainBox.setVisible(true);
-        playAgainBox.setManaged(true);
-    }
-
-    private void handleDealerNotQualified(StringBuilder result, Player player) {
-        result.append("Play bet returned: $").append(player.playBet).append("\n");
-        playerPushedAntes += player.anteBet;
-        result.append("Ante pushes to next hand (Total pushed: $")
-                .append(playerPushedAntes).append(")\n");
-        player.playBet = 0;
-    }
-
-    private void handlePlayerWin(StringBuilder result, Player player) {
-        int mainGameWinnings = (player.anteBet + player.playBet);
-        player.totalWinnings += mainGameWinnings;
-
-        if (playerPushedAntes > 0) {
-            player.totalWinnings += playerPushedAntes;
-            result.append("Won pushed antes: $").append(playerPushedAntes).append("\n");
-            playerPushedAntes = 0;
-        }
-        result.append("Main Game Winnings: $").append(mainGameWinnings).append("\n");
-    }
-
-    private void handlePlayerLoss(StringBuilder result, Player player) {
-        result.append("Main Game Loss\n");
-        if (playerPushedAntes > 0) {
-            result.append("Lost pushed antes: $").append(playerPushedAntes).append("\n");
-            playerPushedAntes = 0;
-        }
-    }
-
-    private void checkPlayDecision() {
-        if (playDecisionMade) {
-            revealDealerCards();
-            evaluateRound();
-        }
-    }
-
-    private void revealDealerCards() {
-        for (javafx.scene.Node node : dealerCards.getChildren()) {
-            if (node instanceof CardVisual) {
-                ((CardVisual) node).setFaceUp();
-            }
         }
     }
 
@@ -899,13 +784,14 @@ public class JavaFXTemplate extends Application {
 
     private void updateWinningsDisplay() {
         playerTotalWinningsLabel.getStyleClass().add("winnings-label");
-        playerTotalWinningsLabel.setText(String.format("Total Winnings: $%d", Math.max(0, player.totalWinnings)));
+        // Remove the Math.max to allow negative values for losses
+        playerTotalWinningsLabel.setText(String.format("Total Winnings: $%d", player.totalWinnings));
     }
 
     private void resetGame() {
         // Reset player state
-        player.totalWinnings = 0;
-        playerPushedAntes = 0;
+        // player.totalWinnings = 0;
+        // playerPushedAntes = 0;
 
         // Reset game flags
         initialBetMade = false;
@@ -966,10 +852,6 @@ public class JavaFXTemplate extends Application {
         }
     }
 
-    private void updateTotalWinningsLabelStyle() {
-        playerTotalWinningsLabel.getStyleClass().add("winnings-label");
-    }
-
     private void updatePushedAntesDisplay() {
         playerPushedAntesLabel.setText(String.format("Pushed Antes: $%d", playerPushedAntes));
     }
@@ -996,11 +878,6 @@ public class JavaFXTemplate extends Application {
         gameInfoLabel.setText("Player: Place your ante bet");
         playAgainBox.setVisible(false);
         dealButton.setDisable(true);
-    }
-
-    private void showStartScreen() {
-        primaryStage.setScene(startScene);
-        primaryStage.setTitle("Three Card Poker");
     }
 
     public static void main(String[] args) {
