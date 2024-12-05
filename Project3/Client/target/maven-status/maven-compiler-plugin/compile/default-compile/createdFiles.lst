@@ -2,8 +2,8 @@ PokerInfo$MessageType.class
 CardVisual.class
 JavaFXTemplate$GameState.class
 Deck.class
-ThreeCardLogic.class
 Player.class
+ThreeCardLogic.class
 PokerInfo.class
 JavaFXTemplate.class
 JavaFXTemplate$1.class

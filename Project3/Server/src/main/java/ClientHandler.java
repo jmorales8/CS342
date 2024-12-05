@@ -113,36 +113,63 @@ public class ClientHandler implements Runnable {
         PokerInfo response = new PokerInfo();
         response.setMessageType(PokerInfo.MessageType.DEALER_CARDS);
         response.setDealerCards(dealerCards);
-        
+
         StringBuilder resultMessage = new StringBuilder();
         int anteBet = info.getAnteBet();
-        int playBet = info.getPlayBet();
-        
+        int playBet = anteBet; // Play bet must equal ante bet
+
+        System.out.println("Starting hand - Ante bet: $" + anteBet);
+        System.out.println("Current pushed antes: $" + pushedAntes);
+
         if (!info.isPlayerFolded()) {
             boolean dealerQualified = GameLogic.isDealerQualified(dealerCards);
+            System.out.println("Dealer qualified: " + dealerQualified);
+
             if (!dealerQualified) {
-                pushedAntes += anteBet;
-                resultMessage.append("Dealer doesn't qualify. Ante pushed to next hand.");
+                // Return play bet and push ante
+                pushedAntes = anteBet;
+                resultMessage.append("Dealer doesn't qualify. Play bet returned, ante pushed to next hand.");
             } else {
                 boolean playerWins = GameLogic.compareHands(playerCards, dealerCards);
+                System.out.println("Player wins: " + playerWins);
+
                 if (playerWins) {
-                    playerTotalWinnings += (anteBet + playBet) * 2;
-                    resultMessage.append("Player wins! Total won: $").append((anteBet + playBet) * 2);
+                    // Win pays 1:1 on both ante and play bets
+                    int winnings = anteBet + playBet;
+                    playerTotalWinnings += winnings;
+                    pushedAntes = 0;
+                    resultMessage.append("Player wins! Winnings: $").append(winnings);
                 } else {
-                    resultMessage.append("Dealer wins. Player loses ante.");
+                    pushedAntes = 0;
+                    resultMessage.append("Dealer wins. Player loses ante and play bets.");
                 }
             }
         } else {
+            pushedAntes = 0;
             resultMessage.append("Player folded. Ante lost.");
         }
-        
+
+        // Add pair plus evaluation if bet was made
+        if (info.getPairPlusBet() > 0) {
+            int pairPlusWinnings = ThreeCardLogic.evalPPWinnings(playerCards, info.getPairPlusBet());
+            if (pairPlusWinnings > 0) {
+                playerTotalWinnings += pairPlusWinnings;
+                resultMessage.append("\nPair Plus wins: $").append(pairPlusWinnings);
+            } else {
+                resultMessage.append("\nPair Plus bet lost.");
+            }
+        }
+
+        System.out.println("End of hand - Total winnings: $" + playerTotalWinnings);
+        System.out.println("Final pushed antes: $" + pushedAntes);
+
         response.setResultMessage(resultMessage.toString());
         response.setTotalWinnings(playerTotalWinnings);
         response.setPushedAntes(pushedAntes);
-        
+
         out.writeObject(response);
         out.flush();
-     }
+    }
 
     public void sendPokerInfo(PokerInfo info) {
         try {
