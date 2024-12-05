@@ -137,8 +137,7 @@ public class JavaFXTemplate extends Application {
         VBox content = new VBox(10);
         content.getChildren().addAll(
                 new Label("Port:"),
-                portField
-        );
+                portField);
         dialog.getDialogPane().setContent(content);
 
         // Add buttons
@@ -177,7 +176,7 @@ public class JavaFXTemplate extends Application {
         }
     }
 
-// Add these to your client-side code
+    // Add these to your client-side code
     private void monitorMoneyChanges(PokerInfo info) {
         System.out.println("====== Money Update Received ======");
         System.out.println("Previous Total: $" + player.totalWinnings);
@@ -278,12 +277,27 @@ public class JavaFXTemplate extends Application {
         // Rules text
         VBox rulesText = new VBox(10);
         rulesText.getChildren().addAll(
-                createRuleSection("Basic Play:", "• Players make an Ante bet to compete against the dealer\n" + "• Ante bets must be between $5 and $25\n" + "• Players may also make an optional Pair Plus bet ($5-$25)\n" + "• Three cards are dealt to each player and the dealer\n" + "• Players must then either fold or make a Play bet equal to their Ante"),
-                createRuleSection("Dealer Qualification:", "• Dealer must have Queen-high or better to qualify\n" + "• If dealer doesn't qualify:\n" + "  - Play bet is returned\n" + "  - Ante bet is pushed to next hand\n" + "• If dealer qualifies, highest poker hand wins"),
-                createRuleSection("Hand Rankings (Highest to Lowest):", "1. Straight Flush\n" + "2. Three of a Kind\n" + "3. Straight\n" + "4. Flush\n" + "5. Pair\n" + "6. High Card"),
-                createRuleSection("Pair Plus Payouts:", "• Straight Flush: 40 to 1\n" + "• Three of a Kind: 30 to 1\n" + "• Straight: 6 to 1\n" + "• Flush: 3 to 1\n" + "• Pair: 1 to 1"),
-                createRuleSection("Important Notes:", "• Pair Plus bet wins regardless of dealer's hand\n" + "• Ante and Play bets pay 1 to 1 on wins\n" + "• Folding forfeits both Ante and Pair Plus bets\n" + "• Ace can be high or low in straights")
-        );
+                createRuleSection("Basic Play:",
+                        "• Players make an Ante bet to compete against the dealer\n"
+                                + "• Ante bets must be between $5 and $25\n"
+                                + "• Players may also make an optional Pair Plus bet ($5-$25)\n"
+                                + "• Three cards are dealt to each player and the dealer\n"
+                                + "• Players must then either fold or make a Play bet equal to their Ante"),
+                createRuleSection("Dealer Qualification:",
+                        "• Dealer must have Queen-high or better to qualify\n" + "• If dealer doesn't qualify:\n"
+                                + "  - Play bet is returned\n" + "  - Ante bet is pushed to next hand\n"
+                                + "• If dealer qualifies, highest poker hand wins"),
+                createRuleSection("Hand Rankings (Highest to Lowest):",
+                        "1. Straight Flush\n" + "2. Three of a Kind\n" + "3. Straight\n" + "4. Flush\n" + "5. Pair\n"
+                                + "6. High Card"),
+                createRuleSection("Pair Plus Payouts:",
+                        "• Straight Flush: 40 to 1\n" + "• Three of a Kind: 30 to 1\n" + "• Straight: 6 to 1\n"
+                                + "• Flush: 3 to 1\n" + "• Pair: 1 to 1"),
+                createRuleSection("Important Notes:",
+                        "• Pair Plus bet wins regardless of dealer's hand\n"
+                                + "• Ante and Play bets pay 1 to 1 on wins\n"
+                                + "• Folding forfeits both Ante and Pair Plus bets\n"
+                                + "• Ace can be high or low in straights"));
 
         ScrollPane scrollPane = new ScrollPane(rulesText);
         scrollPane.getStyleClass().add("rules-scroll-pane");
@@ -326,7 +340,7 @@ public class JavaFXTemplate extends Application {
     }
 
     private void createStartScreen() {
-        BorderPane startRoot = new BorderPane();  // Change to BorderPane
+        BorderPane startRoot = new BorderPane(); // Change to BorderPane
         startRoot.getStyleClass().add("root");
 
         VBox contentBox = new VBox(20);
@@ -338,7 +352,7 @@ public class JavaFXTemplate extends Application {
         contentBox.getChildren().add(titleText);
         contentBox.getChildren().addAll(buttons);
 
-        startRoot.setCenter(contentBox);  // Center the content
+        startRoot.setCenter(contentBox); // Center the content
         // Remove any margins
         BorderPane.setMargin(contentBox, Insets.EMPTY);
 
@@ -358,7 +372,7 @@ public class JavaFXTemplate extends Application {
         Button exitButton = createStyledButton("Exit", "danger-button",
                 e -> Platform.exit());
 
-        return new Button[]{startButton, rulesButton, exitButton};
+        return new Button[] { startButton, rulesButton, exitButton };
     }
 
     private boolean isCardFaceUp(StackPane cardPane) {
@@ -385,10 +399,11 @@ public class JavaFXTemplate extends Application {
             cardVisual.setFaceUp();
         }
 
-        return cardVisual;  // CardVisual already extends StackPane
+        return cardVisual; // CardVisual already extends StackPane
     }
 
-    private Button createStyledButton(String text, String styleClass, javafx.event.EventHandler<javafx.event.ActionEvent> handler) {
+    private Button createStyledButton(String text, String styleClass,
+            javafx.event.EventHandler<javafx.event.ActionEvent> handler) {
         Button button = new Button(text);
         button.getStyleClass().add(styleClass);
         button.setOnAction(handler);
@@ -462,9 +477,9 @@ public class JavaFXTemplate extends Application {
     }
 
     private VBox createDealerArea() {
-        VBox area = new VBox(20);  // Increased spacing between elements
+        VBox area = new VBox(20); // Increased spacing between elements
         area.setAlignment(Pos.CENTER);
-        area.setPrefWidth(SCENE_WIDTH);  // Ensure full width
+        area.setPrefWidth(SCENE_WIDTH); // Ensure full width
 
         // Create play again box first
         createPlayAgainBox();
@@ -501,7 +516,7 @@ public class JavaFXTemplate extends Application {
 
     private Button createStyledButton(String text, String color) {
         Button button = new Button(text);
-        button.getStyleClass().clear();  // Clear default styles
+        button.getStyleClass().clear(); // Clear default styles
         button.getStyleClass().add("game-button");
 
         switch (text) {
@@ -545,8 +560,7 @@ public class JavaFXTemplate extends Application {
                 playerPushedAntesLabel,
                 playerCards,
                 createBetFields(),
-                buttonContainer
-        );
+                buttonContainer);
 
         return area;
     }
@@ -624,7 +638,7 @@ public class JavaFXTemplate extends Application {
         return button;
     }
 
-// Update createPlayAgainBox() for better positioning
+    // Update createPlayAgainBox() for better positioning
     private void createPlayAgainBox() {
         playAgainBox = new HBox(10);
         playAgainBox.setAlignment(Pos.CENTER);
@@ -668,13 +682,14 @@ public class JavaFXTemplate extends Application {
         if (!initialBetMade) {
             try {
                 int anteBet = Integer.parseInt(playerAnteField.getText());
+                player.anteBet = anteBet; // Store ante bet
                 int pairPlusBet = 0;
 
                 if (!playerPairPlusField.getText().isEmpty()) {
                     pairPlusBet = Integer.parseInt(playerPairPlusField.getText());
+                    player.pairPlusBet = pairPlusBet; // Store pair plus bet
                 }
 
-                // Create and send bet info to server
                 PokerInfo betInfo = new PokerInfo();
                 betInfo.setMessageType(PokerInfo.MessageType.PLACE_BETS);
                 betInfo.setAnteBet(anteBet);
@@ -683,10 +698,8 @@ public class JavaFXTemplate extends Application {
                 out.writeObject(betInfo);
                 out.flush();
 
-                // Disable bet fields after sending
                 playerAnteField.setDisable(true);
                 playerPairPlusField.setDisable(true);
-
                 initialBetMade = true;
 
             } catch (IOException e) {
@@ -694,8 +707,13 @@ public class JavaFXTemplate extends Application {
             }
         } else {
             try {
-                // Send play/fold decision to server
-                PokerInfo decision = PokerInfo.playDecision(!isPlay, isPlay ? player.anteBet : 0);
+                PokerInfo decision = new PokerInfo();
+                decision.setMessageType(PokerInfo.MessageType.PLAY_DECISION);
+                decision.setPlayerFolded(!isPlay);
+                decision.setAnteBet(player.anteBet);
+                decision.setPairPlusBet(player.pairPlusBet);
+                decision.setPlayBet(isPlay ? player.anteBet : 0);
+
                 out.writeObject(decision);
                 out.flush();
 
@@ -735,7 +753,7 @@ public class JavaFXTemplate extends Application {
     }
 
     private void createExitScreen() {
-        BorderPane exitRoot = new BorderPane();  // Change to BorderPane
+        BorderPane exitRoot = new BorderPane(); // Change to BorderPane
         exitRoot.getStyleClass().add("exit-root");
 
         VBox contentBox = new VBox(20);
@@ -748,8 +766,7 @@ public class JavaFXTemplate extends Application {
         // Subtitle with current winnings
         Text standingsText = new Text(String.format(
                 "Current Winnings: $%d",
-                player.totalWinnings
-        ));
+                player.totalWinnings));
         standingsText.getStyleClass().add("standings-text");
 
         // Buttons container
@@ -767,7 +784,7 @@ public class JavaFXTemplate extends Application {
         buttonBox.getChildren().addAll(continueButton, quitButton);
         contentBox.getChildren().addAll(exitText, standingsText, buttonBox);
 
-        exitRoot.setCenter(contentBox);  // Center the content
+        exitRoot.setCenter(contentBox); // Center the content
         // Remove any margins
         BorderPane.setMargin(contentBox, Insets.EMPTY);
 
@@ -808,9 +825,8 @@ public class JavaFXTemplate extends Application {
 
         // Reset game state and UI
         gameInfoLabel.setText("Player: Place your bet");
-        dealerArea.getChildren().removeIf(node
-                -> node instanceof HBox && ((HBox) node).getStyleClass().contains("results-container")
-        );
+        dealerArea.getChildren()
+                .removeIf(node -> node instanceof HBox && ((HBox) node).getStyleClass().contains("results-container"));
         playAgainBox.setVisible(false);
 
         // Update displays
@@ -827,7 +843,7 @@ public class JavaFXTemplate extends Application {
         MenuItem rulesItem = createMenuItem("Game Rules", e -> showRulesDialog());
         newLookItem = createMenuItem("Switch to Light Theme", e -> toggleTheme());
 
-        return new MenuItem[]{exitItem, freshStartItem, rulesItem, newLookItem};
+        return new MenuItem[] { exitItem, freshStartItem, rulesItem, newLookItem };
     }
 
     private MenuItem createMenuItem(String text, javafx.event.EventHandler<javafx.event.ActionEvent> handler) {

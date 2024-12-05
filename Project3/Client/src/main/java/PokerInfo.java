@@ -43,11 +43,12 @@ public class PokerInfo implements Serializable {
         return info;
     }
     
-    public static PokerInfo playDecision(boolean fold, int playBet) {
+    public static PokerInfo playDecision(boolean fold, int anteBet) {
         PokerInfo info = new PokerInfo();
         info.messageType = MessageType.PLAY_DECISION;
         info.playerFolded = fold;
-        info.playBet = playBet;
+        info.playBet = anteBet;
+        info.anteBet = anteBet;
         return info;
     }
     
