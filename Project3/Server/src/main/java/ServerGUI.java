@@ -64,7 +64,7 @@ public class ServerGUI {
         Button clearButton = new Button("Clear Log");
         stopButton.setStyle("-fx-background-color: #f44336; -fx-text-fill: white;");
         clearButton.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white;");
-        
+
         clientCountLabel = new Label("Connected Clients: 0");
         controlBox.getChildren().addAll(stopButton, clearButton, clientCountLabel);
 

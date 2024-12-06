@@ -11,19 +11,24 @@ public class ThreeCardLogic {
         if (isFlush(hand) && isStraight(hand)) {
             return 1; // Straight flush
 
-                }if (isThreeOfAKind(hand)) {
-            return 2;              // Three of a kind
+        }
+        if (isThreeOfAKind(hand)) {
+            return 2; // Three of a kind
 
-                }if (isStraight(hand)) {
-            return 3;                  // Straight
+        }
+        if (isStraight(hand)) {
+            return 3; // Straight
 
-                }if (isFlush(hand)) {
-            return 4;                     // Flush
+        }
+        if (isFlush(hand)) {
+            return 4; // Flush
 
-                }if (isPair(hand)) {
-            return 5;                      // Pair
+        }
+        if (isPair(hand)) {
+            return 5; // Pair
 
-                }return 0;                                       // High card
+        }
+        return 0; // High card
     }
 
     private static boolean isFlush(ArrayList<Card> hand) {
@@ -76,13 +81,13 @@ public class ThreeCardLogic {
             case 2:
                 return bet * 30; // Three of a kind
             case 3:
-                return bet * 6;  // Straight
+                return bet * 6; // Straight
             case 4:
-                return bet * 3;  // Flush
+                return bet * 3; // Flush
             case 5:
-                return bet;      // Pair
+                return bet; // Pair
             default:
-                return 0;       // Lost bet
+                return 0; // Lost bet
         }
     }
 
@@ -94,7 +99,8 @@ public class ThreeCardLogic {
         if (dealerHandValue < playerHandValue) {
             return 2; // Player wins
 
-                }if (dealerHandValue > playerHandValue) {
+        }
+        if (dealerHandValue > playerHandValue) {
             return 1; // Dealer wins
         }
         // If same hand type, compare high cards

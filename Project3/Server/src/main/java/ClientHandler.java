@@ -19,8 +19,8 @@ public class ClientHandler implements Runnable {
     private Dealer dealer;
     private ArrayList<Card> playerCards;
     private ArrayList<Card> dealerCards;
-    private int playerTotalWinnings = 0; // Track total winnings across games
-    private int pushedAntes = 0; // Track pushed antes
+    private int playerTotalWinnings = 0;
+    private int pushedAntes = 0;
 
     public ClientHandler(Socket socket, ServerLogic server) {
         this.clientSocket = socket;
@@ -119,7 +119,6 @@ public class ClientHandler implements Runnable {
 
         StringBuilder resultMessage = new StringBuilder();
         int anteBet = info.getAnteBet();
-        int playBet = anteBet;
 
         System.out.println("Starting hand - Ante bet: $" + anteBet);
         System.out.println("Current pushed antes: $" + pushedAntes);

@@ -180,7 +180,6 @@ public class JavaFXTemplate extends Application {
         }
     }
 
-    // Add these to your client-side code
     private void monitorMoneyChanges(PokerInfo info) {
         System.out.println("====== Money Update Received ======");
         System.out.println("Previous Total: $" + player.totalWinnings);
@@ -192,7 +191,6 @@ public class JavaFXTemplate extends Application {
     }
 
     private void handleServerResponse(PokerInfo info) {
-        // Add monitoring before processing
         monitorMoneyChanges(info);
 
         switch (info.getMessageType()) {
@@ -323,12 +321,6 @@ public class JavaFXTemplate extends Application {
         rulesStage.show();
     }
 
-    private void setCardFaceUp(StackPane cardPane) {
-        if (cardPane instanceof CardVisual) {
-            ((CardVisual) cardPane).setFaceUp();
-        }
-    }
-
     private void initializeTheme() {
         String css = getClass().getResource("/css/dark-theme.css").toExternalForm();
         currentTheme = "default";
@@ -344,7 +336,7 @@ public class JavaFXTemplate extends Application {
     }
 
     private void createStartScreen() {
-        BorderPane startRoot = new BorderPane(); // Change to BorderPane
+        BorderPane startRoot = new BorderPane();
         startRoot.getStyleClass().add("root");
 
         VBox contentBox = new VBox(20);
@@ -356,8 +348,7 @@ public class JavaFXTemplate extends Application {
         contentBox.getChildren().add(titleText);
         contentBox.getChildren().addAll(buttons);
 
-        startRoot.setCenter(contentBox); // Center the content
-        // Remove any margins
+        startRoot.setCenter(contentBox);
         BorderPane.setMargin(contentBox, Insets.EMPTY);
 
         startScene = new Scene(startRoot, SCENE_WIDTH, SCENE_HEIGHT);
@@ -379,19 +370,6 @@ public class JavaFXTemplate extends Application {
         return new Button[] { startButton, rulesButton, exitButton };
     }
 
-    private boolean isCardFaceUp(StackPane cardPane) {
-        try {
-            Object[] data = (Object[]) cardPane.getUserData();
-            if (data != null) {
-                VBox content = (VBox) data[0];
-                return content.isVisible();
-            }
-        } catch (Exception e) {
-            System.err.println("Error checking card face: " + e.getMessage());
-        }
-        return false;
-    }
-
     private StackPane createCardNode(Card card, boolean isFaceDown) {
         // Create visual representation using CardVisual class
         CardVisual cardVisual = new CardVisual(card);
@@ -403,7 +381,7 @@ public class JavaFXTemplate extends Application {
             cardVisual.setFaceUp();
         }
 
-        return cardVisual; // CardVisual already extends StackPane
+        return cardVisual;
     }
 
     private Button createStyledButton(String text, String styleClass,
@@ -447,12 +425,12 @@ public class JavaFXTemplate extends Application {
 
     private VBox createBetFields() {
         VBox betContainer = new VBox(5);
-        betContainer.setAlignment(Pos.CENTER); // Center alignment
+        betContainer.setAlignment(Pos.CENTER);
 
         HBox anteBox = new HBox(5);
         HBox pairPlusBox = new HBox(5);
-        anteBox.setAlignment(Pos.CENTER); // Center the ante box
-        pairPlusBox.setAlignment(Pos.CENTER); // Center the pair plus box
+        anteBox.setAlignment(Pos.CENTER);
+        pairPlusBox.setAlignment(Pos.CENTER);
 
         Label anteLabel = createStyledLabel("Ante:", "player-label");
         Label pairPlusLabel = createStyledLabel("Pair+:", "player-label");
@@ -481,9 +459,9 @@ public class JavaFXTemplate extends Application {
     }
 
     private VBox createDealerArea() {
-        VBox area = new VBox(20); // Increased spacing between elements
+        VBox area = new VBox(20);
         area.setAlignment(Pos.CENTER);
-        area.setPrefWidth(SCENE_WIDTH); // Ensure full width
+        area.setPrefWidth(SCENE_WIDTH);
 
         // Create play again box first
         createPlayAgainBox();
@@ -520,7 +498,7 @@ public class JavaFXTemplate extends Application {
 
     private Button createStyledButton(String text, String color) {
         Button button = new Button(text);
-        button.getStyleClass().clear(); // Clear default styles
+        button.getStyleClass().clear();
         button.getStyleClass().add("game-button");
 
         switch (text) {
@@ -549,8 +527,8 @@ public class JavaFXTemplate extends Application {
         // Initialize player fields
         playerAnteField = createStyledTextField("Enter Ante Bet");
         playerPairPlusField = createStyledTextField("Enter Pair Plus Bet");
-        playerPlayButton = createStyledButton("Play", "#4CAF50");
-        playerFoldButton = createStyledButton("Fold", "#f44336");
+        playerPlayButton = createStyledButton("Play", "play-button");
+        playerFoldButton = createStyledButton("Fold", "fold-button");
         playerTotalWinningsLabel = createStyledLabel("Total Winnings: $0", "winnings-label");
         playerPushedAntesLabel = createStyledLabel("Pushed Antes: $0", "pushed-antes-label");
 
@@ -580,10 +558,9 @@ public class JavaFXTemplate extends Application {
         VBox topContainer = new VBox(0);
         topContainer.setAlignment(Pos.TOP_CENTER);
 
-        // Create the deal button instead of back button
         dealButton = createDealButton();
-        dealButton.setVisible(false); // Initially invisible
-        dealButton.setManaged(false); // Initially not taking space
+        dealButton.setVisible(false);
+        dealButton.setManaged(false);
 
         menuBar.setPrefWidth(SCENE_WIDTH);
         menuBar.setMinHeight(30);
@@ -592,12 +569,11 @@ public class JavaFXTemplate extends Application {
         topContainer.getChildren().addAll(menuBar, dealButton);
         return topContainer;
     }
-    // Update createDealButton() method
 
     private Button createDealButton() {
         Button button = new Button("Deal New Hand");
-        button.getStyleClass().add("primary-button"); // Changed from danger-button for better UX
-        button.setMaxWidth(200); // Set a specific max width for better appearance
+        button.getStyleClass().add("primary-button");
+        button.setMaxWidth(200);
         button.setOnAction(e -> {
             // Reset game state
             initialBetMade = false;
@@ -654,32 +630,6 @@ public class JavaFXTemplate extends Application {
         dealButton = createDealButton();
 
         playAgainBox.getChildren().addAll(playAgainLabel, dealButton);
-    }
-
-    private String determineWinner(ArrayList<Card> dealer, ArrayList<Card> player, int anteBet, int playBet) {
-        // First check if dealer qualifies (Queen high or better)
-        ArrayList<Integer> dealerValues = new ArrayList<>();
-        for (Card card : dealer) {
-            dealerValues.add(card.getValue());
-        }
-        Collections.sort(dealerValues, Collections.reverseOrder());
-
-        // If dealer doesn't qualify (less than Queen high)
-        if (dealerValues.get(0) < 12) {
-            return "Dealer does not qualify (less than Queen high)";
-        }
-
-        // If dealer qualifies, compare hands using existing ThreeCardLogic method
-        int result = ThreeCardLogic.compareHands(dealer, player);
-
-        switch (result) {
-            case 1:
-                return "Dealer wins";
-            case 2:
-                return "You win";
-            default:
-                return "It's a tie";
-        }
     }
 
     private void handlePlayerAction(boolean isPlay) {
@@ -759,52 +709,52 @@ public class JavaFXTemplate extends Application {
     private void createExitScreen() {
         BorderPane exitRoot = new BorderPane();
         exitRoot.getStyleClass().add("exit-root");
-    
+
         VBox contentBox = new VBox(20);
         contentBox.setAlignment(Pos.CENTER);
-    
+
         Text exitText = new Text("Are you sure you want to exit?");
         exitText.getStyleClass().add("exit-text");
-    
+
         Text standingsText = new Text(String.format(
                 "Current Winnings: $%d",
                 player.totalWinnings));
         standingsText.getStyleClass().add("standings-text");
-    
+
         HBox buttonBox = new HBox(20);
         buttonBox.setAlignment(Pos.CENTER);
-    
+
         Button continueButton = new Button("Continue Playing");
         continueButton.getStyleClass().add("continue-button");
         continueButton.setOnAction(e -> returnToGame());
-    
+
         Button quitButton = new Button("Quit Game");
         quitButton.getStyleClass().add("quit-button");
         quitButton.setOnAction(e -> closeConnectionAndExit());
-    
+
         buttonBox.getChildren().addAll(continueButton, quitButton);
         contentBox.getChildren().addAll(exitText, standingsText, buttonBox);
-    
+
         exitRoot.setCenter(contentBox);
         BorderPane.setMargin(contentBox, Insets.EMPTY);
-    
+
         exitScene = new Scene(exitRoot, 500, 300);
         exitScene.getStylesheets().addAll(gameScene.getStylesheets());
     }
-    
+
     private void showExitScreen() {
         if (exitScene == null) {
             createExitScreen();
         }
         primaryStage.setScene(exitScene);
-        
+
         // Add window close handler after scene is set
         primaryStage.setOnCloseRequest(e -> {
             e.consume();
             closeConnectionAndExit();
         });
     }
-    
+
     // Helper method to handle connection closing and exit
     private void closeConnectionAndExit() {
         try {
@@ -822,15 +772,11 @@ public class JavaFXTemplate extends Application {
 
     private void updateWinningsDisplay() {
         playerTotalWinningsLabel.getStyleClass().add("winnings-label");
-        // Remove the Math.max to allow negative values for losses
+
         playerTotalWinningsLabel.setText(String.format("Total Winnings: $%d", player.totalWinnings));
     }
 
     private void resetGame() {
-        // Reset player state
-        // player.totalWinnings = 0;
-        // playerPushedAntes = 0;
-
         // Reset game flags
         initialBetMade = false;
         playDecisionMade = false;
@@ -899,7 +845,6 @@ public class JavaFXTemplate extends Application {
         playerPlayButton.setDisable(!enabled);
         playerFoldButton.setDisable(!enabled);
     }
-    // Optimized resetUI method
 
     private void resetUI() {
         // Reset text fields and buttons

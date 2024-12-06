@@ -13,7 +13,7 @@ public class ServerApp extends Application {
         this.primaryStage = primaryStage;
         this.serverLogic = new ServerLogic();
         this.serverGUI = new ServerGUI(serverLogic, this::switchToGameScene);
-        
+
         primaryStage.setTitle("Poker Server");
         primaryStage.setScene(new Scene(serverGUI.createPortScene(), 400, 300));
         primaryStage.show();

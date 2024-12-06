@@ -64,7 +64,7 @@ class ThreeCardLogicTest {
         playerHand.add(new Card('H', 2));
         playerHand.add(new Card('H', 3));
         playerHand.add(new Card('H', 4));
-        
+
         assertEquals(1, ThreeCardLogic.compareHands(dealerHand, playerHand));
 
         // Test player wins with higher card
@@ -77,7 +77,7 @@ class ThreeCardLogicTest {
         highPlayer.add(new Card('S', 3));
         highPlayer.add(new Card('D', 6));
         highPlayer.add(new Card('C', 9));
-        
+
         assertEquals(2, ThreeCardLogic.compareHands(highDealer, highPlayer));
     }
 }

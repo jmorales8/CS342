@@ -35,7 +35,7 @@ public class JavaFXTemplate extends Application {
     public void start(Stage primaryStage) throws Exception {
         this.primaryStage = primaryStage;
         this.server = new ServerLogic();
-        server.setGUI(this); // Make sure ServerLogic has a reference to this GUI
+        server.setGUI(this);
 
         showPortInputScene();
 
@@ -141,7 +141,7 @@ public class JavaFXTemplate extends Application {
     private void testConnection(Label statusLabel) {
         new Thread(() -> {
             try {
-                Socket testSocket = new Socket("localhost", currentPort); // Use currentPort instead of reading from portField
+                Socket testSocket = new Socket("localhost", currentPort);
 
                 Platform.runLater(() -> {
                     statusLabel.setTextFill(Color.GREEN);

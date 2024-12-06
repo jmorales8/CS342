@@ -19,8 +19,7 @@ public class ServerLogic {
     private CopyOnWriteArrayList<ClientHandler> clients;
     private JavaFXTemplate gui;
     private int currentPort;
-    private int connectedUsers = 0;  // Add counter for connected users
-    private Label clientsLabel; // Add this field
+    private Label clientsLabel;
 
     public ServerLogic() {
         clients = new CopyOnWriteArrayList<>();
@@ -56,7 +55,7 @@ public class ServerLogic {
         this.clientsLabel = label;
     }
 
-    public void setGUI(JavaFXTemplate gui) {  // Changed parameter type
+    public void setGUI(JavaFXTemplate gui) {
         this.gui = gui;
     }
 
