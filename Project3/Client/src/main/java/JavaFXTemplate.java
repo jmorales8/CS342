@@ -84,6 +84,10 @@ public class JavaFXTemplate extends Application {
         showConnectionDialog();
         primaryStage.setScene(startScene);
         primaryStage.show();
+        primaryStage.setOnCloseRequest(e -> {
+            e.consume(); // Prevent default close
+            showExitScreen();
+        });
     }
 
     private void toggleTheme() {
@@ -753,50 +757,67 @@ public class JavaFXTemplate extends Application {
     }
 
     private void createExitScreen() {
-        BorderPane exitRoot = new BorderPane(); // Change to BorderPane
+        BorderPane exitRoot = new BorderPane();
         exitRoot.getStyleClass().add("exit-root");
-
+    
         VBox contentBox = new VBox(20);
         contentBox.setAlignment(Pos.CENTER);
-
-        // Title
+    
         Text exitText = new Text("Are you sure you want to exit?");
         exitText.getStyleClass().add("exit-text");
-
-        // Subtitle with current winnings
+    
         Text standingsText = new Text(String.format(
                 "Current Winnings: $%d",
                 player.totalWinnings));
         standingsText.getStyleClass().add("standings-text");
-
-        // Buttons container
+    
         HBox buttonBox = new HBox(20);
         buttonBox.setAlignment(Pos.CENTER);
-
+    
         Button continueButton = new Button("Continue Playing");
         continueButton.getStyleClass().add("continue-button");
         continueButton.setOnAction(e -> returnToGame());
-
+    
         Button quitButton = new Button("Quit Game");
         quitButton.getStyleClass().add("quit-button");
-        quitButton.setOnAction(e -> Platform.exit());
-
+        quitButton.setOnAction(e -> closeConnectionAndExit());
+    
         buttonBox.getChildren().addAll(continueButton, quitButton);
         contentBox.getChildren().addAll(exitText, standingsText, buttonBox);
-
-        exitRoot.setCenter(contentBox); // Center the content
-        // Remove any margins
+    
+        exitRoot.setCenter(contentBox);
         BorderPane.setMargin(contentBox, Insets.EMPTY);
-
+    
         exitScene = new Scene(exitRoot, 500, 300);
         exitScene.getStylesheets().addAll(gameScene.getStylesheets());
     }
-
+    
     private void showExitScreen() {
         if (exitScene == null) {
             createExitScreen();
         }
         primaryStage.setScene(exitScene);
+        
+        // Add window close handler after scene is set
+        primaryStage.setOnCloseRequest(e -> {
+            e.consume();
+            closeConnectionAndExit();
+        });
+    }
+    
+    // Helper method to handle connection closing and exit
+    private void closeConnectionAndExit() {
+        try {
+            if (out != null) out.close();
+            if (in != null) in.close();
+            if (socket != null && !socket.isClosed()) {
+                socket.close();
+            }
+        } catch (IOException ex) {
+            System.err.println("Error closing connection: " + ex.getMessage());
+        } finally {
+            Platform.exit();
+        }
     }
 
     private void updateWinningsDisplay() {

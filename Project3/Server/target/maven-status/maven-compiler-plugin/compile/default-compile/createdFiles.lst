@@ -3,8 +3,8 @@ ClientHandler$1.class
 CardVisual.class
 GameLogic.class
 Deck.class
-Player.class
 ThreeCardLogic.class
+Player.class
 PokerInfo.class
 ClientHandler.class
 JavaFXTemplate.class

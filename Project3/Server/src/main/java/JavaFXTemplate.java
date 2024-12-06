@@ -109,7 +109,8 @@ public class JavaFXTemplate extends Application {
         testConnectionButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
 
         Label clientsLabel = new Label("Connected Clients: 0");
-        Label portLabel = new Label("Current Port: " + currentPort); // Add this to show current port
+        server.setClientsLabel(clientsLabel);
+        Label portLabel = new Label("Current Port: " + currentPort);
 
         Label connectionStatus = new Label("");
         connectionStatus.setStyle("-fx-font-weight: bold;");

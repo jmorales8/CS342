@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.ArrayList;
 
 public class ClientHandler implements Runnable {
@@ -41,7 +42,9 @@ public class ClientHandler implements Runnable {
                         PokerInfo info = (PokerInfo) message;
                         handlePokerInfo(info);
                     }
-                } catch (EOFException e) {
+                } catch (EOFException | SocketException e) {
+                    // Client disconnected
+                    server.logMessage("Client disconnected unexpectedly");
                     break;
                 }
             }
@@ -53,6 +56,10 @@ public class ClientHandler implements Runnable {
     }
 
     public void closeConnection() {
+        if (!isRunning) {
+            return; // Already closed
+        }
+
         isRunning = false;
         try {
             if (out != null) {
@@ -61,23 +68,19 @@ public class ClientHandler implements Runnable {
             if (in != null) {
                 in.close();
             }
-            if (clientSocket != null) {
+            if (clientSocket != null && !clientSocket.isClosed()) {
                 clientSocket.close();
+                server.logMessage("Client socket closed");
             }
         } catch (IOException e) {
             server.logMessage("Error closing client connection: " + e.getMessage());
+        } finally {
+            server.removeClient(this);
+            server.logMessage("Client handler removed from server");
         }
-        server.removeClient(this);
     }
 
-    private void logMoneyChange(String action, int amount, int totalBefore, int totalAfter) {
-        String message = String.format(
-                " Money Change: Action: %s Amount: $%d Total Before: $%d Total After: $%d Current Pushed Antes: $%d ---------------------------------------- ",
-                action, amount, totalBefore, totalAfter, pushedAntes);
-        server.logMessage(message);
-    }
-
-    private void handlePokerInfo(PokerInfo info) {
+    void handlePokerInfo(PokerInfo info) {
         try {
             switch (info.getMessageType()) {
                 case PLACE_BETS:
@@ -116,26 +119,32 @@ public class ClientHandler implements Runnable {
 
         StringBuilder resultMessage = new StringBuilder();
         int anteBet = info.getAnteBet();
-        int playBet = anteBet; // Play bet must equal ante bet
+        int playBet = anteBet;
 
         System.out.println("Starting hand - Ante bet: $" + anteBet);
         System.out.println("Current pushed antes: $" + pushedAntes);
+
+        server.logMessage("==== New Play Decision ====");
+        server.logMessage("Ante Bet: $" + info.getAnteBet());
+        server.logMessage("Pair Plus Bet: $" + info.getPairPlusBet());
+        server.logMessage("Player Folded: " + info.isPlayerFolded());
+        server.logMessage("Current Total Winnings: $" + playerTotalWinnings);
 
         if (!info.isPlayerFolded()) {
             boolean dealerQualified = GameLogic.isDealerQualified(dealerCards);
             System.out.println("Dealer qualified: " + dealerQualified);
 
             if (!dealerQualified) {
-                // Return play bet and push ante
-                pushedAntes = anteBet;
-                resultMessage.append("Dealer doesn't qualify. Play bet returned, ante pushed to next hand.");
+                pushedAntes += anteBet;
+                resultMessage.append("Dealer doesn't qualify. Play bet returned. Total pushed antes: $")
+                        .append(pushedAntes);
             } else {
                 boolean playerWins = GameLogic.compareHands(playerCards, dealerCards);
                 System.out.println("Player wins: " + playerWins);
 
                 if (playerWins) {
-                    // Win pays 1:1 on both ante and play bets
-                    int winnings = anteBet + playBet;
+                    int totalAnte = anteBet + pushedAntes; // Combine current ante with pushed antes
+                    int winnings = totalAnte * 2; // Win pays 1:1 on total ante amount
                     playerTotalWinnings += winnings;
                     pushedAntes = 0;
                     resultMessage.append("Player wins! Winnings: $").append(winnings);
@@ -145,11 +154,10 @@ public class ClientHandler implements Runnable {
                 }
             }
         } else {
-            pushedAntes = 0;
+            pushedAntes = 0; // Reset pushed antes on fold
             resultMessage.append("Player folded. Ante lost.");
         }
 
-        // Add pair plus evaluation if bet was made
         if (info.getPairPlusBet() > 0) {
             int pairPlusWinnings = ThreeCardLogic.evalPPWinnings(playerCards, info.getPairPlusBet());
             if (pairPlusWinnings > 0) {
@@ -160,8 +168,11 @@ public class ClientHandler implements Runnable {
             }
         }
 
-        System.out.println("End of hand - Total winnings: $" + playerTotalWinnings);
-        System.out.println("Final pushed antes: $" + pushedAntes);
+        server.logMessage("\nSending Response:");
+        server.logMessage("Total Winnings being sent: $" + playerTotalWinnings);
+        server.logMessage("Pushed Antes being sent: $" + pushedAntes);
+        server.logMessage("Result Message: " + resultMessage.toString());
+        server.logMessage("================================");
 
         response.setResultMessage(resultMessage.toString());
         response.setTotalWinnings(playerTotalWinnings);
